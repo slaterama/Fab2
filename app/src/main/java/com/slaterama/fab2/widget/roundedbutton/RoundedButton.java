@@ -83,7 +83,7 @@ public class RoundedButton extends Button
 		options.useCompatPadding = a.getBoolean(
 				R.styleable.RoundedButton_qslib_useCompatPadding, options.useCompatPadding);
 		a.recycle();
-		mImpl = newRoundedButtonImpl(options);
+		mImpl = newRoundedButtonImpl(this, options);
 	}
 
 	@Override
@@ -127,9 +127,8 @@ public class RoundedButton extends Button
 	}
 
 	@Override
-	public void setContentPadding(int paddingLeft, int paddingTop, int paddingRight,
-	                              int paddingBottom) {
-		mImpl.setContentPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+	public void setContentPadding(int left, int top, int right, int bottom) {
+		mImpl.setContentPadding(left, top, right, bottom);
 	}
 
 	@Override
@@ -163,8 +162,8 @@ public class RoundedButton extends Button
 	}
 
 	@Override
-	public void setInsetPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-		mImpl.setInsetPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+	public void setInsetPadding(int left, int top, int right, int bottom) {
+		mImpl.setInsetPadding(left, top, right, bottom);
 	}
 
 	@Override

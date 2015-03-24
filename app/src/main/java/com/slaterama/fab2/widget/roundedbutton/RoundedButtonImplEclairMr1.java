@@ -2,10 +2,15 @@ package com.slaterama.fab2.widget.roundedbutton;
 
 import android.content.res.ColorStateList;
 
-public class RoundedButtonImplEclairMr1
-		implements RoundedButtonHelper.RoundedButtonImpl {
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
 
-	public RoundedButtonImplEclairMr1(RoundedButtonHelper.RoundedButtonOptions options) {
+public class RoundedButtonImplEclairMr1
+		implements RoundedButtonImpl {
+
+	public RoundedButtonImplEclairMr1(RoundedButtonDelegate delegate,
+	                                  RoundedButtonOptions options) {
 		super();
 		// TODO Set variables
 	}

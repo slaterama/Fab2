@@ -9,13 +9,14 @@ public class RoundedButtonHelper {
 	private RoundedButtonHelper() {
 	}
 
-	static RoundedButtonImpl newRoundedButtonImpl(RoundedButtonOptions options) {
+	static RoundedButtonImpl newRoundedButtonImpl(RoundedButtonDelegate delegate,
+	                                              RoundedButtonOptions options) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			return new RoundedButtonImplLollipop(options);
+			return new RoundedButtonImplLollipop(delegate, options);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			return new RoundedButtonImplJellybeanMr1(options);
+			return new RoundedButtonImplJellybeanMr1(delegate, options);
 		} else {
-			return new RoundedButtonImplEclairMr1(options);
+			return new RoundedButtonImplEclairMr1(delegate, options);
 		}
 	}
 
@@ -44,15 +45,14 @@ public class RoundedButtonHelper {
 		int getContentPaddingTop();
 		int getContentPaddingRight();
 		int getContentPaddingBottom();
-		void setContentPadding(int paddingLeft, int paddingTop, int paddingRight,
-		                       int paddingBottom);
+		void setContentPadding(int left, int top, int right, int bottom);
 		float getCornerRadius();
 		void setCornerRadius(float cornerRadius);
 		int getInsetPaddingLeft();
 		int getInsetPaddingTop();
 		int getInsetPaddingRight();
 		int getInsetPaddingBottom();
-		void setInsetPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom);
+		void setInsetPadding(int left, int top, int right, int bottom);
 		float getMaxElevation();
 		void setMaxElevation(float maxElevation);
 		boolean isPreventCornerOverlap();
