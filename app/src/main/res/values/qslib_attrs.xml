@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<attr name="qslib_buttonColor" format="color" />
+	<attr name="qslib_contentPadding" format="dimension" />
+	<attr name="qslib_contentPaddingLeft" format="dimension" />
+	<attr name="qslib_contentPaddingRight" format="dimension" />
+	<attr name="qslib_contentPaddingTop" format="dimension" />
+	<attr name="qslib_contentPaddingBottom" format="dimension" />
+	<attr name="qslib_cornerRadius" format="dimension" />
+	<attr name="qslib_disabledElevation" format="dimension" />
+	<attr name="qslib_elevation" format="dimension" />
+	<attr name="qslib_insetPadding" format="dimension" />
+	<attr name="qslib_insetPaddingLeft" format="dimension" />
+	<attr name="qslib_insetPaddingRight" format="dimension" />
+	<attr name="qslib_insetPaddingTop" format="dimension" />
+	<attr name="qslib_insetPaddingBottom" format="dimension" />
+	<attr name="qslib_maxElevation" format="dimension" />
+	<attr name="qslib_pressedTranslationZ" format="dimension" />
+	<attr name="qslib_preventCornerOverlap" format="boolean" />
+	<attr name="qslib_translationZ" format="dimension" />
+	<attr name="qslib_useCompatAnimation" format="boolean" />
+	<attr name="qslib_useCompatPadding" format="boolean" />
+
+	<!-- TODO pressedTranslationZ? disabledElevation? -->
+
+	<declare-styleable name="RoundedButton">
+		<attr name="qslib_buttonColor" />
+		<attr name="qslib_contentPadding" />
+		<attr name="qslib_contentPaddingLeft" />
+		<attr name="qslib_contentPaddingRight" />
+		<attr name="qslib_contentPaddingTop" />
+		<attr name="qslib_contentPaddingBottom" />
+		<attr name="qslib_cornerRadius" />
+		<attr name="qslib_disabledElevation" />
+		<attr name="qslib_elevation" />
+		<attr name="qslib_insetPadding" />
+		<attr name="qslib_insetPaddingLeft" />
+		<attr name="qslib_insetPaddingRight" />
+		<attr name="qslib_insetPaddingTop" />
+		<attr name="qslib_insetPaddingBottom" />
+		<attr name="qslib_maxElevation" />
+		<attr name="qslib_pressedTranslationZ" />
+		<attr name="qslib_preventCornerOverlap" />
+		<attr name="qslib_translationZ" />
+		<attr name="qslib_useCompatAnimation" />
+		<attr name="qslib_useCompatPadding" />
+	</declare-styleable>
+
+	<declare-styleable name="RoundedImageButton">
+		<attr name="qslib_buttonColor" />
+		<attr name="qslib_contentPadding" />
+		<attr name="qslib_contentPaddingLeft" />
+		<attr name="qslib_contentPaddingRight" />
+		<attr name="qslib_contentPaddingTop" />
+		<attr name="qslib_contentPaddingBottom" />
+		<attr name="qslib_cornerRadius" />
+		<attr name="qslib_disabledElevation" />
+		<attr name="qslib_elevation" />
+		<attr name="qslib_insetPadding" />
+		<attr name="qslib_insetPaddingLeft" />
+		<attr name="qslib_insetPaddingRight" />
+		<attr name="qslib_insetPaddingTop" />
+		<attr name="qslib_insetPaddingBottom" />
+		<attr name="qslib_maxElevation" />
+		<attr name="qslib_pressedTranslationZ" />
+		<attr name="qslib_preventCornerOverlap" />
+		<attr name="qslib_translationZ" />
+		<attr name="qslib_useCompatAnimation" />
+		<attr name="qslib_useCompatPadding" />
+	</declare-styleable>
+
+	<declare-styleable name="FloatingActionButton">
+		<attr name="qslib_buttonColor" />
+		<attr name="qslib_contentPadding" />
+		<attr name="qslib_contentPaddingLeft" />
+		<attr name="qslib_contentPaddingRight" />
+		<attr name="qslib_contentPaddingTop" />
+		<attr name="qslib_contentPaddingBottom" />
+		<attr name="qslib_cornerRadius" />
+		<attr name="qslib_disabledElevation" />
+		<attr name="qslib_elevation" />
+		<attr name="qslib_insetPadding" />
+		<attr name="qslib_insetPaddingLeft" />
+		<attr name="qslib_insetPaddingRight" />
+		<attr name="qslib_insetPaddingTop" />
+		<attr name="qslib_insetPaddingBottom" />
+		<attr name="qslib_maxElevation" />
+		<attr name="qslib_pressedTranslationZ" />
+		<attr name="qslib_preventCornerOverlap" />
+		<attr name="qslib_translationZ" />
+		<attr name="qslib_useCompatAnimation" />
+		<attr name="qslib_useCompatPadding" />
+	</declare-styleable>
+
+	<!-- RoundedButton style. -->
+	<attr name="roundedButtonStyle" format="reference" />
+
+	<!-- RoundedImageButton style. -->
+	<attr name="roundedImageButtonStyle" format="reference" />
+
+	<!-- Normal FloatingActionButton style. -->
+	<attr name="floatingActionButtonStyle" format="reference" />
+
+	<!-- Small FloatingActionButton style. -->
+	<attr name="smallFloatingActionButtonStyle" format="reference" />
+
+</resources>

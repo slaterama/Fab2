@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="qslib_Theme.Holo" parent="android:Theme.Holo">
+		<item name="roundedButtonStyle">@style/Widget.Holo.RoundedButton</item>
+		<item name="roundedImageButtonStyle">@style/Widget.Holo.RoundedImageButton</item>
+		<item name="floatingActionButtonStyle">@style/Widget.Holo.FloatingActionButton</item>
+		<item name="smallFloatingActionButtonStyle">@style/Widget.Holo.FloatingActionButton.Small</item>
+	</style>
+
+	<style name="qslib_Theme.Holo.Light" parent="android:Theme.Holo.Light">
+		<item name="roundedButtonStyle">@style/Widget.Holo.Light.RoundedButton</item>
+		<item name="roundedImageButtonStyle">@style/Widget.Holo.Light.RoundedImageButton</item>
+		<item name="floatingActionButtonStyle">@style/Widget.Holo.Light.FloatingActionButton</item>
+		<item name="smallFloatingActionButtonStyle">@style/Widget.Holo.Light.FloatingActionButton.Small</item>
+	</style>
+
+</resources>

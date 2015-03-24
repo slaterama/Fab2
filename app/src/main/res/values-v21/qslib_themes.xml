@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="qslib_Theme.Material" parent="android:Theme.Material">
+        <item name="roundedButtonStyle">@style/Widget.Material.RoundedButton</item>
+        <item name="roundedImageButtonStyle">@style/Widget.Material.RoundedImageButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Material.FloatingActionButton</item>
+        <item name="smallFloatingActionButtonStyle">@style/Widget.Material.FloatingActionButton.Small</item>
+    </style>
+
+    <style name="qslib_Theme.Material.Light" parent="android:Theme.Material.Light">
+        <item name="roundedButtonStyle">@style/Widget.Material.Light.RoundedButton</item>
+        <item name="roundedImageButtonStyle">@style/Widget.Material.Light.RoundedImageButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Material.Light.FloatingActionButton</item>
+        <item name="smallFloatingActionButtonStyle">@style/Widget.Material.Light.FloatingActionButton.Small</item>
+    </style>
+
+    <style name="qslib_Theme.Material.Light.DarkActionBar" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="roundedButtonStyle">@style/Widget.Material.Light.RoundedButton</item>
+        <item name="roundedImageButtonStyle">@style/Widget.Material.Light.RoundedImageButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Material.Light.FloatingActionButton</item>
+        <item name="smallFloatingActionButtonStyle">@style/Widget.Material.Light.FloatingActionButton.Small</item>
+    </style>
+
+</resources>

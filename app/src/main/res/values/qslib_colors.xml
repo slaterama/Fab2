@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<color name="qslib_legacy_button_pressed">#fffea50b</color>
+	<color name="qslib_legacy_button_normal">#f3dbdbdb</color>
+
+	<color name="qslib_legacy_fab_pressed">#fff17a0a</color>
+	<color name="qslib_legacy_fab_normal">#fffeaa0c</color>
+
+	<color name="qslib_holo_blue_light">#ff33b5e5</color>
+	<color name="qslib_holo_blue_dark">#ff0099cc</color>
+
+	<color name="qslib_holo_control_activated">@color/qslib_holo_blue_light</color>
+	<color name="qslib_holo_light_control_activated">@color/qslib_holo_control_activated</color>
+
+	<color name="qslib_holo_button_pressed">#59f0f0f0</color>
+	<color name="qslib_holo_button_normal">#bd292f34</color>
+	<color name="qslib_holo_button_disabled">#39292f34</color>
+
+	<color name="qslib_holo_light_button_pressed">#66666666</color>
+	<color name="qslib_holo_light_button_normal">#b3cccccc</color>
+	<color name="qslib_holo_light_button_disabled">#36cccccc</color>
+
+	<color name="qslib_holo_fab_pressed">@color/qslib_holo_blue_dark</color>
+	<color name="qslib_holo_fab_normal">@color/qslib_holo_blue_light</color>
+
+	<color name="qslib_holo_light_fab_pressed">@color/qslib_holo_fab_pressed</color>
+	<color name="qslib_holo_light_fab_normal">@color/qslib_holo_fab_normal</color>
+
+	<color name="qslib_button_material_dark">#ff5a595b</color>
+	<color name="qslib_button_material_light">#ffd6d7d7</color>
+
+	<color name="qslib_fab_material_dark">#ff5677fc</color>
+	<color name="qslib_fab_material_light">@color/qslib_fab_material_dark</color>
+
+	<item name="qslib_disabled_alpha_material_light" format="float" type="dimen">0.26</item>
+	<item name="qslib_disabled_alpha_material_dark" format="float" type="dimen">0.30</item>
+
+	<color name="qslib_button_material_dark_disabled">#4d5a595b</color>
+	<color name="qslib_button_material_light_disabled">#42d6d7d7</color>
+
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="qslib_Theme" parent="android:Theme">
+		<item name="roundedButtonStyle">@style/Widget.RoundedButton</item>
+		<item name="roundedImageButtonStyle">@style/Widget.RoundedImageButton</item>
+		<item name="floatingActionButtonStyle">@style/Widget.FloatingActionButton</item>
+		<item name="smallFloatingActionButtonStyle">@style/Widget.FloatingActionButton.Small</item>
+	</style>
+
+	<style name="qslib_Theme.Light" parent="android:Theme.Light">
+		<item name="roundedButtonStyle">@style/Widget.RoundedButton</item>
+		<item name="roundedImageButtonStyle">@style/Widget.RoundedImageButton</item>
+		<item name="floatingActionButtonStyle">@style/Widget.FloatingActionButton</item>
+		<item name="smallFloatingActionButtonStyle">@style/Widget.FloatingActionButton.Small</item>
+	</style>
+
+</resources>
