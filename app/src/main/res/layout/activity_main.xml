@@ -21,7 +21,8 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="8dp"
 		android:text="@string/hello_world"
-		app:qslib_useCompatAnimation="true"/>
+		app:qslib_useCompatAnimation="true"
+		app:qslib_cornerRadius="16dp"/>
 
 	<Button
 		android:id="@+id/button"

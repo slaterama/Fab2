@@ -6,33 +6,35 @@ import android.animation.StateListAnimator;
 import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.content.res.Resources.Theme;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.Outline;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
-import android.util.Log;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.slaterama.fab2.R;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.BASE_SPECS;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.ELEVATION_PROPERTY;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.PRESSED_SPECS;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SHADOW_MULTIPLIER;
 
 @TargetApi(LOLLIPOP)
 public class RoundedButtonImplLollipop
 		implements RoundedButtonImpl {
-
-	static int[] PRESSED_SPECS = new int[]{android.R.attr.state_pressed,
-			android.R.attr.state_enabled};
-	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
-
-	static String ELEVATION_PROPERTY = "elevation";
 
 	RoundedButtonDelegate mDelegate;
 	View mView;
@@ -48,7 +50,7 @@ public class RoundedButtonImplLollipop
 
 	StateListAnimator mSavedStateListAnimator;
 
-	Drawable mBackgroundDrawable;
+	BackgroundDrawable mBackgroundDrawable;
 
 	public RoundedButtonImplLollipop(RoundedButtonDelegate delegate, RoundedButtonOptions options) {
 		super();
@@ -73,31 +75,26 @@ public class RoundedButtonImplLollipop
 			mView.setStateListAnimator(newStateListAnimator(mView, mPressedTranslationZ));
 		}
 		mUseCompatPadding = options.useCompatPadding;
+		mView.setClipToOutline(true);
 
-		// TODO Test create RippleDrawable
-		/*
-		Resources resources = mView.getResources();
-		RippleDrawable rippleDrawable = (RippleDrawable) resources.getDrawable(
-				R.drawable.qslib_button_default_material_ripple, mView.getContext().getTheme());
-		Log.d("RoundedButton", String.format("rippleDrawable=%s", rippleDrawable));
-
-		if (rippleDrawable != null) {
-			Drawable bg = mView.getBackground();
-			if (bg instanceof RippleDrawable) {
-				RippleDrawable rd = (RippleDrawable) bg;
-				Drawable inner0 = rd.getDrawable(0);
-				if (inner0 != null) {
-					rippleDrawable.setDrawableByLayerId(0, inner0);
-				}
-			}
+		mBackgroundDrawable = new BackgroundDrawable();
+		Drawable drawableWrapper = mDelegate.createDrawableWrapper(mBackgroundDrawable);
+		if (drawableWrapper == null) {
+			drawableWrapper = newDefaultDrawableWrapper(mView.getContext().getTheme(),
+					mBackgroundDrawable);
 		}
-		mView.setBackground(rippleDrawable);
-		*/
+		mView.setBackground(drawableWrapper);
+	}
+
+	@Override
+	public ColorStateList getColor() {
+		return mColor;
 	}
 
 	@Override
 	public void setColor(ColorStateList color) {
-
+		mColor = color;
+		mBackgroundDrawable.invalidateSelf();
 	}
 
 	@Override
@@ -125,7 +122,7 @@ public class RoundedButtonImplLollipop
 		if (left != mContentPadding.left || top != mContentPadding.top
 				|| right != mContentPadding.right || bottom != mContentPadding.bottom) {
 			mContentPadding.set(left, top, right, bottom);
-			// TODO: paddingChange only (+ requestLayout)
+			invalidatePadding();
 		}
 	}
 
@@ -138,8 +135,10 @@ public class RoundedButtonImplLollipop
 	public void setCornerRadius(float cornerRadius) {
 		if (cornerRadius != mCornerRadius) {
 			mCornerRadius = cornerRadius;
-			// TODO: draw change
-			// TODO: possible padding change IF preventCornerOverlap (+ requestLayout)
+			mBackgroundDrawable.invalidateSelf();
+			if (mPreventCornerOverlap) {
+				invalidatePadding();
+			}
 		}
 	}
 
@@ -168,8 +167,9 @@ public class RoundedButtonImplLollipop
 		if (left != mInsetPadding.left || top != mInsetPadding.top
 				|| right != mInsetPadding.right || bottom != mInsetPadding.bottom) {
 			mInsetPadding.set(left, top, right, bottom);
-			// TODO: draw change
-			// TODO: paddingChange (+ requestLayout)
+			mBackgroundDrawable.updateBounds(null);
+			mBackgroundDrawable.invalidateSelf();
+			invalidatePadding();
 		}
 	}
 
@@ -182,8 +182,11 @@ public class RoundedButtonImplLollipop
 	public void setMaxElevation(float maxElevation) {
 		if (maxElevation != mMaxElevation) {
 			mMaxElevation = maxElevation;
-			// TODO: draw change (if < Lollipop or useCompatPadding)
-			// TODO: paddingChange (if < Lollipop or useCompatPadding)
+			if (/* Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP || */ mUseCompatPadding) {
+				mBackgroundDrawable.updateBounds(null);
+				mBackgroundDrawable.invalidateSelf();
+				invalidatePadding();
+			}
 		}
 	}
 
@@ -196,7 +199,7 @@ public class RoundedButtonImplLollipop
 	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
 		if (preventCornerOverlap != mPreventCornerOverlap) {
 			mPreventCornerOverlap = preventCornerOverlap;
-			// TODO: paddingChange (+ requestLayout)
+			invalidatePadding();
 		}
 	}
 
@@ -240,12 +243,39 @@ public class RoundedButtonImplLollipop
 
 	@Override
 	public boolean isUseCompatPadding() {
-		return false;
+		return mUseCompatPadding;
 	}
 
 	@Override
 	public void setUseCompatPadding(boolean useCompatPadding) {
+		if (useCompatPadding != mUseCompatPadding) {
+			mUseCompatPadding = useCompatPadding;
+			mBackgroundDrawable.updateBounds(null);
+			mBackgroundDrawable.invalidateSelf();
+			invalidatePadding();
+		}
+	}
 
+	void invalidatePadding() {
+		int left = mInsetPadding.left;
+		int top = mInsetPadding.top;
+		int right = mInsetPadding.right;
+		int bottom = mInsetPadding.bottom;
+		if (mUseCompatPadding) {
+			float verticalPadding = mMaxElevation * SHADOW_MULTIPLIER;
+			left += mMaxElevation;
+			top += verticalPadding;
+			right += mMaxElevation;
+			bottom += verticalPadding;
+		}
+		if (mPreventCornerOverlap) {
+			int overlapPadding = (int) Math.ceil((1 - COS_45) * mCornerRadius);
+			left += overlapPadding;
+			top += overlapPadding;
+			right += overlapPadding;
+			bottom += overlapPadding;
+		}
+		mDelegate.onPaddingChanged(left, top, right, bottom);
 	}
 
 	static StateListAnimator newStateListAnimator(View view, float pressedTranslationZ) {
@@ -270,5 +300,84 @@ public class RoundedButtonImplLollipop
 				ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, 0f).setDuration(0L));
 		animator.addState(StateSet.WILD_CARD, set);
 		return animator;
+	}
+
+	static Drawable newDefaultDrawableWrapper(Theme theme, Drawable source) {
+		TypedValue outValue = new TypedValue();
+		theme.resolveAttribute(android.R.attr.colorControlHighlight, outValue, true);
+		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
+		return new RippleDrawable(rippleColor, source, null);
+	}
+
+	class BackgroundDrawable extends Drawable {
+		final RectF mBoundsF = new RectF();
+		final Rect mBoundsI = new Rect();
+		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+		@Override
+		public void setAlpha(int alpha) {
+			// TODO ?
+			// not supported because older versions do not support
+		}
+
+		@Override
+		public void setColorFilter(ColorFilter cf) {
+			// TODO ?
+			// not supported because older versions do not support
+		}
+
+		@Override
+		public int getOpacity() {
+			return PixelFormat.OPAQUE;
+		}
+
+		@Override
+		public void getOutline(Outline outline) {
+			outline.setRoundRect(mBoundsI, mCornerRadius);
+		}
+
+		@Override
+		public boolean isStateful() {
+			return mColor.isStateful();
+		}
+
+		@Override
+		protected void onBoundsChange(Rect bounds) {
+			super.onBoundsChange(bounds);
+			updateBounds(bounds);
+		}
+
+		@Override
+		protected boolean onStateChange(int[] state) {
+			int color = mColor.getColorForState(state, mColor.getDefaultColor());
+			if (color != mPaint.getColor()) {
+				mPaint.setColor(color);
+				return true;
+			} else {
+				return super.onStateChange(state);
+			}
+		}
+
+		@Override
+		public void draw(Canvas canvas) {
+			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+		}
+
+		void updateBounds(Rect bounds) {
+			if (bounds == null) {
+				bounds = getBounds();
+			}
+
+			mBoundsI.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
+					bounds.right - mInsetPadding.right, bounds.bottom - mInsetPadding.bottom);
+			mBoundsF.set(mBoundsI);
+
+			if (mUseCompatPadding) {
+				int paddingHorizontal = (int) Math.ceil(mMaxElevation);
+				int paddingVertical = (int) Math.ceil(mMaxElevation * SHADOW_MULTIPLIER);
+				mBoundsI.inset(paddingHorizontal, paddingVertical);
+				mBoundsF.set(mBoundsI);
+			}
+ 		}
 	}
 }

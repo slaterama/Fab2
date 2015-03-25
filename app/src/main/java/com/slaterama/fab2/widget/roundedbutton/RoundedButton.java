@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.Button;
@@ -92,6 +93,11 @@ public class RoundedButton extends Button
 	@Override
 	public void setPaddingRelative(int start, int top, int end, int bottom) {
 		// NO OP
+	}
+
+	@Override
+	public ColorStateList getColor() {
+		return mImpl.getColor();
 	}
 
 	@Override
@@ -225,7 +231,13 @@ public class RoundedButton extends Button
 	}
 
 	@Override
+	public Drawable createDrawableWrapper(Drawable source) {
+		return null;
+	}
+
+	@Override
 	public void onPaddingChanged(int left, int top, int right, int bottom) {
 		super.setPadding(left, top, right, bottom);
+		// requestLayout() ?
 	}
 }

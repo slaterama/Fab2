@@ -2,9 +2,21 @@ package com.slaterama.fab2.widget.roundedbutton;
 
 import android.content.res.ColorStateList;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 public class RoundedButtonHelper {
+
+	static int[] PRESSED_SPECS = new int[]{android.R.attr.state_pressed,
+			android.R.attr.state_enabled};
+	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
+
+	static String ELEVATION_PROPERTY = "elevation";
+
+	static final float SHADOW_MULTIPLIER = 1.5f;
+
+	// used to calculate overlap padding
+	static final double COS_45 = Math.cos(Math.toRadians(45));
 
 	private RoundedButtonHelper() {
 	}
@@ -39,6 +51,7 @@ public class RoundedButtonHelper {
 	}
 
 	interface RoundedButtonBase {
+		ColorStateList getColor();
 		void setColor(ColorStateList color);
 		int getContentPaddingLeft();
 		int getContentPaddingTop();
@@ -68,6 +81,7 @@ public class RoundedButtonHelper {
 
 	interface RoundedButtonDelegate extends RoundedButtonBase, OnPaddingChangedListener {
 		void setColor(int color);
+		Drawable createDrawableWrapper(Drawable source);
 	}
 
 	interface RoundedButtonImpl extends RoundedButtonBase {

@@ -16,6 +16,11 @@ public class RoundedButtonImplEclairMr1
 	}
 
 	@Override
+	public ColorStateList getColor() {
+		return null;
+	}
+
+	@Override
 	public void setColor(ColorStateList color) {
 
 	}
