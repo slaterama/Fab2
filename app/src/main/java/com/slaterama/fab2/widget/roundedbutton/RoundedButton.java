@@ -56,8 +56,6 @@ public class RoundedButton extends Button
 				R.styleable.RoundedButton_qslib_contentPaddingBottom, defaultContentPadding);
 		options.cornerRadius = a.getDimension(R.styleable.RoundedButton_qslib_cornerRadius,
 				options.cornerRadius);
-		options.disabledElevation = a.getDimension(
-				R.styleable.RoundedButton_qslib_disabledElevation, options.disabledElevation);
 		options.elevation = a.getDimension(R.styleable.RoundedButton_qslib_elevation,
 				options.elevation);
 		int defaultInsetPadding = a.getDimensionPixelOffset(

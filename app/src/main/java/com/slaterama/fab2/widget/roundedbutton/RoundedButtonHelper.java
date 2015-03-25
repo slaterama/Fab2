@@ -24,7 +24,6 @@ public class RoundedButtonHelper {
 		ColorStateList color = null;
 		final Rect contentPadding = new Rect();
 		float cornerRadius = 0f;
-		float disabledElevation = 0f;
 		float elevation = 0f;
 		final Rect insetPadding = new Rect();
 		float maxElevation = 0f;

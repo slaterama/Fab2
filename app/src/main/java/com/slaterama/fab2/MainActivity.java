@@ -4,9 +4,18 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+
+import com.slaterama.fab2.widget.roundedbutton.RoundedButton;
 
 
 public class MainActivity extends Activity {
+
+	RoundedButton mRoundedButton;
+	Button mButton;
+	CheckBox mCheckBox;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +27,10 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+		mRoundedButton = (RoundedButton) findViewById(R.id.roundedbutton);
+		mButton = (Button) findViewById(R.id.button);
+		mCheckBox = (CheckBox) findViewById(R.id.checkbox);
+		mCheckBox.setChecked(mRoundedButton.isEnabled());
 		return true;
 	}
 
@@ -34,5 +47,15 @@ public class MainActivity extends Activity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void onClick(View v) {
+		int id = v.getId();
+		switch (id) {
+			case R.id.checkbox:
+				mRoundedButton.setEnabled(mCheckBox.isChecked());
+				mButton.setEnabled(mCheckBox.isChecked());
+				break;
+		}
 	}
 }

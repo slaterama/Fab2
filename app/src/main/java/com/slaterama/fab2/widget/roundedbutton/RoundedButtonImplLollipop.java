@@ -4,21 +4,20 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.StateSet;
 import android.view.View;
 
 import com.slaterama.fab2.R;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@TargetApi(LOLLIPOP)
 public class RoundedButtonImplLollipop
 		implements RoundedButtonImpl {
 
@@ -27,20 +26,16 @@ public class RoundedButtonImplLollipop
 	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
 
 	static String ELEVATION_PROPERTY = "elevation";
-	static String TRANSLATION_Z_PROPERTY = "translationZ";
 
 	RoundedButtonDelegate mDelegate;
 	View mView;
 	ColorStateList mColor;
 	Rect mContentPadding;
 	float mCornerRadius;
-	float mDisabledElevation;
-//	float mElevation;
 	Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
 	boolean mPreventCornerOverlap;
-//	float mTranslationZ;
 	boolean mUseCompatAnimation;
 	boolean mUseCompatPadding;
 
@@ -57,7 +52,6 @@ public class RoundedButtonImplLollipop
 		mColor = options.color;
 		mContentPadding = options.contentPadding;
 		mCornerRadius = options.cornerRadius;
-		mDisabledElevation = options.disabledElevation;
 		mView.setElevation(options.elevation);
 		mInsetPadding = options.insetPadding;
 		mMaxElevation = options.maxElevation;
@@ -67,8 +61,7 @@ public class RoundedButtonImplLollipop
 		mUseCompatAnimation = options.useCompatAnimation;
 		if (mUseCompatAnimation) {
 			mSavedStateListAnimator = mView.getStateListAnimator();
-			mView.setStateListAnimator(newStateListAnimator(mView, mDisabledElevation,
-					mPressedTranslationZ));
+			mView.setStateListAnimator(newStateListAnimator(mView, mPressedTranslationZ));
 		}
 		mUseCompatPadding = options.useCompatPadding;
 	}
@@ -209,8 +202,7 @@ public class RoundedButtonImplLollipop
 			mUseCompatAnimation = useCompatAnimation;
 			if (mUseCompatAnimation) {
 				mSavedStateListAnimator = mView.getStateListAnimator();
-				mView.setStateListAnimator(newStateListAnimator(mView, mDisabledElevation,
-						mPressedTranslationZ));
+				mView.setStateListAnimator(newStateListAnimator(mView, mPressedTranslationZ));
 			} else {
 				mView.setStateListAnimator(mSavedStateListAnimator);
 			}
@@ -227,38 +219,26 @@ public class RoundedButtonImplLollipop
 
 	}
 
-	static StateListAnimator newStateListAnimator(View view,
-	                                              float disabledElevation,
-	                                              float pressedTranslationZ) {
+	static StateListAnimator newStateListAnimator(View view, float pressedTranslationZ) {
 		Resources resources = view.getResources();
 		float elevation = view.getElevation();
 		int duration = resources.getInteger(R.integer.qslib_button_pressed_animation_duration);
-		int startDelay = resources.getInteger(R.integer.qslib_button_pressed_animation_delay);
 
 		StateListAnimator animator = new StateListAnimator();
 		AnimatorSet set = new AnimatorSet();
-		ObjectAnimator translationZAnimator = ObjectAnimator.ofFloat(view, TRANSLATION_Z_PROPERTY,
-				pressedTranslationZ).setDuration(duration);
-		ObjectAnimator elevationAnimator = ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY,
-				elevation).setDuration(0L);
-		set.playTogether(translationZAnimator, elevationAnimator);
+		set.playTogether(ObjectAnimator.ofFloat(view, View.TRANSLATION_Z, pressedTranslationZ).
+						setDuration(duration),
+				ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, elevation).setDuration(0L));
 		animator.addState(PRESSED_SPECS, set);
 
 		set = new AnimatorSet();
-		translationZAnimator = ObjectAnimator.ofFloat(view, TRANSLATION_Z_PROPERTY,
-				pressedTranslationZ, 0f).setDuration(duration);
-		translationZAnimator.setStartDelay(startDelay);
-		elevationAnimator = ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, elevation)
-				.setDuration(0L);
-		set.playTogether(translationZAnimator, elevationAnimator);
+		set.playTogether(ObjectAnimator.ofFloat(view, View.TRANSLATION_Z, 0f).setDuration(duration),
+				ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, elevation).setDuration(0L));
 		animator.addState(BASE_SPECS, set);
 
 		set = new AnimatorSet();
-		translationZAnimator = ObjectAnimator.ofFloat(view, TRANSLATION_Z_PROPERTY, 0f)
-				.setDuration(0L);
-		elevationAnimator = ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, disabledElevation)
-				.setDuration(0L);
-		set.playTogether(translationZAnimator, elevationAnimator);
+		set.playTogether(ObjectAnimator.ofFloat(view, View.TRANSLATION_Z, 0f).setDuration(0L),
+				ObjectAnimator.ofFloat(view, ELEVATION_PROPERTY, 0f).setDuration(0L));
 		animator.addState(StateSet.WILD_CARD, set);
 		return animator;
 	}

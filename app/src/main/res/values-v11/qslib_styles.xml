@@ -4,7 +4,6 @@
 		<item name="qslib_buttonColor">@color/qslib_btn_default_holo_dark</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
@@ -21,7 +20,6 @@
 		<item name="qslib_buttonColor">@color/qslib_btn_default_holo_light</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
@@ -38,7 +36,6 @@
 		<item name="qslib_buttonColor">@color/qslib_btn_default_holo_dark</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
@@ -55,7 +52,6 @@
 		<item name="qslib_buttonColor">@color/qslib_btn_default_holo_light</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
@@ -72,7 +68,6 @@
 		<item name="qslib_buttonColor">@color/qslib_fab_default_holo_dark</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
@@ -89,7 +84,6 @@
 		<item name="qslib_buttonColor">@color/qslib_fab_default_holo_light</item>
 		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
 		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_disabledElevation">@dimen/qslib_rounded_btn_disabled_elevation</item>
 		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
 		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
 		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
