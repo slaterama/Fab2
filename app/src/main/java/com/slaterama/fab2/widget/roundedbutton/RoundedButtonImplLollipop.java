@@ -7,10 +7,17 @@ import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
+import android.util.Log;
 import android.util.StateSet;
 import android.view.View;
 
 import com.slaterama.fab2.R;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
@@ -41,6 +48,8 @@ public class RoundedButtonImplLollipop
 
 	StateListAnimator mSavedStateListAnimator;
 
+	Drawable mBackgroundDrawable;
+
 	public RoundedButtonImplLollipop(RoundedButtonDelegate delegate, RoundedButtonOptions options) {
 		super();
 		mDelegate = delegate;
@@ -64,6 +73,26 @@ public class RoundedButtonImplLollipop
 			mView.setStateListAnimator(newStateListAnimator(mView, mPressedTranslationZ));
 		}
 		mUseCompatPadding = options.useCompatPadding;
+
+		// TODO Test create RippleDrawable
+		/*
+		Resources resources = mView.getResources();
+		RippleDrawable rippleDrawable = (RippleDrawable) resources.getDrawable(
+				R.drawable.qslib_button_default_material_ripple, mView.getContext().getTheme());
+		Log.d("RoundedButton", String.format("rippleDrawable=%s", rippleDrawable));
+
+		if (rippleDrawable != null) {
+			Drawable bg = mView.getBackground();
+			if (bg instanceof RippleDrawable) {
+				RippleDrawable rd = (RippleDrawable) bg;
+				Drawable inner0 = rd.getDrawable(0);
+				if (inner0 != null) {
+					rippleDrawable.setDrawableByLayerId(0, inner0);
+				}
+			}
+		}
+		mView.setBackground(rippleDrawable);
+		*/
 	}
 
 	@Override
