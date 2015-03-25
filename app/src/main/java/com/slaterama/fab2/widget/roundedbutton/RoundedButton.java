@@ -231,6 +231,12 @@ public class RoundedButton extends Button
 	}
 
 	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		// TODO !!!
+	}
+
+	@Override
 	public Drawable createDrawableWrapper(Drawable source) {
 		return null;
 	}
