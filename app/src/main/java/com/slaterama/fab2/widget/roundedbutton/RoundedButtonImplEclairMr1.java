@@ -25,6 +25,7 @@ public class RoundedButtonImplEclairMr1
 
 	}
 
+	/*
 	@Override
 	public int getContentPaddingLeft() {
 		return 0;
@@ -49,6 +50,7 @@ public class RoundedButtonImplEclairMr1
 	public void setContentPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
 
 	}
+	*/
 
 	@Override
 	public float getCornerRadius() {
@@ -92,16 +94,6 @@ public class RoundedButtonImplEclairMr1
 
 	@Override
 	public void setMaxElevation(float maxElevation) {
-
-	}
-
-	@Override
-	public boolean isPreventCornerOverlap() {
-		return false;
-	}
-
-	@Override
-	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
 
 	}
 

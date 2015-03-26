@@ -24,7 +24,6 @@ import com.slaterama.fab2.R;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.BASE_SPECS;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.ELEVATION_PROPERTY;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.PRESSED_SPECS;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
@@ -39,12 +38,10 @@ public class RoundedButtonImplLollipop
 	RoundedButtonDelegate mDelegate;
 	View mView;
 	ColorStateList mColor;
-	Rect mContentPadding;
 	float mCornerRadius;
 	Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
-	boolean mPreventCornerOverlap;
 	boolean mUseCompatAnimation;
 	boolean mUseCompatPadding;
 
@@ -61,13 +58,11 @@ public class RoundedButtonImplLollipop
 			throw new ClassCastException("delegate must be of type View");
 		}
 		mColor = options.color;
-		mContentPadding = options.contentPadding;
 		mCornerRadius = options.cornerRadius;
 		mView.setElevation(options.elevation);
 		mInsetPadding = options.insetPadding;
 		mMaxElevation = options.maxElevation;
 		mPressedTranslationZ = options.pressedTranslationZ;
-		mPreventCornerOverlap = options.preventCornerOverlap;
 		mView.setTranslationZ(options.translationZ);
 		mUseCompatAnimation = options.useCompatAnimation;
 		if (mUseCompatAnimation) {
@@ -84,6 +79,7 @@ public class RoundedButtonImplLollipop
 					mBackgroundDrawable);
 		}
 		mView.setBackground(drawableWrapper);
+		invalidatePadding();
 	}
 
 	@Override
@@ -98,35 +94,6 @@ public class RoundedButtonImplLollipop
 	}
 
 	@Override
-	public int getContentPaddingLeft() {
-		return mContentPadding.left;
-	}
-
-	@Override
-	public int getContentPaddingTop() {
-		return mContentPadding.top;
-	}
-
-	@Override
-	public int getContentPaddingRight() {
-		return mContentPadding.right;
-	}
-
-	@Override
-	public int getContentPaddingBottom() {
-		return mContentPadding.bottom;
-	}
-
-	@Override
-	public void setContentPadding(int left, int top, int right, int bottom) {
-		if (left != mContentPadding.left || top != mContentPadding.top
-				|| right != mContentPadding.right || bottom != mContentPadding.bottom) {
-			mContentPadding.set(left, top, right, bottom);
-			invalidatePadding();
-		}
-	}
-
-	@Override
 	public float getCornerRadius() {
 		return mCornerRadius;
 	}
@@ -136,9 +103,6 @@ public class RoundedButtonImplLollipop
 		if (cornerRadius != mCornerRadius) {
 			mCornerRadius = cornerRadius;
 			mBackgroundDrawable.invalidateSelf();
-			if (mPreventCornerOverlap) {
-				invalidatePadding();
-			}
 		}
 	}
 
@@ -187,19 +151,6 @@ public class RoundedButtonImplLollipop
 				mBackgroundDrawable.invalidateSelf();
 				invalidatePadding();
 			}
-		}
-	}
-
-	@Override
-	public boolean isPreventCornerOverlap() {
-		return mPreventCornerOverlap;
-	}
-
-	@Override
-	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
-		if (preventCornerOverlap != mPreventCornerOverlap) {
-			mPreventCornerOverlap = preventCornerOverlap;
-			invalidatePadding();
 		}
 	}
 
@@ -268,14 +219,7 @@ public class RoundedButtonImplLollipop
 			right += mMaxElevation;
 			bottom += verticalPadding;
 		}
-		if (mPreventCornerOverlap) {
-			int overlapPadding = (int) Math.ceil((1 - COS_45) * mCornerRadius);
-			left += overlapPadding;
-			top += overlapPadding;
-			right += overlapPadding;
-			bottom += overlapPadding;
-		}
-		mDelegate.onPaddingChanged(left, top, right, bottom);
+		mDelegate.onDrawablePaddingChanged(left, top, right, bottom);
 	}
 
 	static StateListAnimator newStateListAnimator(View view, float pressedTranslationZ) {
@@ -367,11 +311,9 @@ public class RoundedButtonImplLollipop
 			if (bounds == null) {
 				bounds = getBounds();
 			}
-
 			mBoundsI.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
 					bounds.right - mInsetPadding.right, bounds.bottom - mInsetPadding.bottom);
 			mBoundsF.set(mBoundsI);
-
 			if (mUseCompatPadding) {
 				int paddingHorizontal = (int) Math.ceil(mMaxElevation);
 				int paddingVertical = (int) Math.ceil(mMaxElevation * SHADOW_MULTIPLIER);

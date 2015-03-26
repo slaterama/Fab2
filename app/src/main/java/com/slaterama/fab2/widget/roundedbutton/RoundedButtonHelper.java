@@ -34,30 +34,23 @@ public class RoundedButtonHelper {
 
 	static class RoundedButtonOptions {
 		ColorStateList color = null;
-		final Rect contentPadding = new Rect();
 		float cornerRadius = 0f;
 		float elevation = 0f;
 		final Rect insetPadding = new Rect();
 		float maxElevation = 0f;
 		float pressedTranslationZ = 0f;
-		boolean preventCornerOverlap = false;
 		float translationZ = 0f;
 		boolean useCompatAnimation = false;
 		boolean useCompatPadding = false;
 	}
 
-	interface OnPaddingChangedListener {
-		void onPaddingChanged(int left, int top, int right, int bottom);
+	interface OnDrawablePaddingChangedListener {
+		void onDrawablePaddingChanged(int left, int top, int right, int bottom);
 	}
 
 	interface RoundedButtonBase {
 		ColorStateList getColor();
 		void setColor(ColorStateList color);
-		int getContentPaddingLeft();
-		int getContentPaddingTop();
-		int getContentPaddingRight();
-		int getContentPaddingBottom();
-		void setContentPadding(int left, int top, int right, int bottom);
 		float getCornerRadius();
 		void setCornerRadius(float cornerRadius);
 		int getInsetPaddingLeft();
@@ -67,8 +60,6 @@ public class RoundedButtonHelper {
 		void setInsetPadding(int left, int top, int right, int bottom);
 		float getMaxElevation();
 		void setMaxElevation(float maxElevation);
-		boolean isPreventCornerOverlap();
-		void setPreventCornerOverlap(boolean preventCornerOverlap);
 		float getSupportElevation();
 		void setSupportElevation(float elevation);
 		float getSupportTranslationZ();
@@ -79,8 +70,15 @@ public class RoundedButtonHelper {
 		void setUseCompatPadding(boolean useCompatPadding);
 	}
 
-	interface RoundedButtonDelegate extends RoundedButtonBase, OnPaddingChangedListener {
+	interface RoundedButtonDelegate extends RoundedButtonBase, OnDrawablePaddingChangedListener {
 		void setColor(int color);
+		int getContentPaddingLeft();
+		int getContentPaddingTop();
+		int getContentPaddingRight();
+		int getContentPaddingBottom();
+		void setContentPadding(int left, int top, int right, int bottom);
+		boolean isPreventCornerOverlap();
+		void setPreventCornerOverlap(boolean preventCornerOverlap);
 		Drawable createDrawableWrapper(Drawable source);
 	}
 
