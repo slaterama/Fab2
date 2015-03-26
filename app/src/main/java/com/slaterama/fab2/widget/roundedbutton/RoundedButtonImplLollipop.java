@@ -24,6 +24,7 @@ import com.slaterama.fab2.R;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.BASE_SPECS;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.ELEVATION_PROPERTY;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.PRESSED_SPECS;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
@@ -38,10 +39,12 @@ public class RoundedButtonImplLollipop
 	RoundedButtonDelegate mDelegate;
 	View mView;
 	ColorStateList mColor;
+	Rect mContentPadding;
 	float mCornerRadius;
 	Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
+	boolean mPreventCornerOverlap;
 	boolean mUseCompatAnimation;
 	boolean mUseCompatPadding;
 
@@ -58,11 +61,13 @@ public class RoundedButtonImplLollipop
 			throw new ClassCastException("delegate must be of type View");
 		}
 		mColor = options.color;
+		mContentPadding = options.contentPadding;
 		mCornerRadius = options.cornerRadius;
 		mView.setElevation(options.elevation);
 		mInsetPadding = options.insetPadding;
 		mMaxElevation = options.maxElevation;
 		mPressedTranslationZ = options.pressedTranslationZ;
+		mPreventCornerOverlap = options.preventCornerOverlap;
 		mView.setTranslationZ(options.translationZ);
 		mUseCompatAnimation = options.useCompatAnimation;
 		if (mUseCompatAnimation) {
@@ -94,6 +99,35 @@ public class RoundedButtonImplLollipop
 	}
 
 	@Override
+	public int getContentPaddingLeft() {
+		return mContentPadding.left;
+	}
+
+	@Override
+	public int getContentPaddingTop() {
+		return mContentPadding.top;
+	}
+
+	@Override
+	public int getContentPaddingRight() {
+		return mContentPadding.right;
+	}
+
+	@Override
+	public int getContentPaddingBottom() {
+		return mContentPadding.bottom;
+	}
+
+	@Override
+	public void setContentPadding(int left, int top, int right, int bottom) {
+		if (left != mContentPadding.left || top != mContentPadding.top
+				|| right != mContentPadding.right || bottom != mContentPadding.bottom) {
+			mContentPadding.set(left, top, right, bottom);
+			invalidatePadding();
+		}
+	}
+
+	@Override
 	public float getCornerRadius() {
 		return mCornerRadius;
 	}
@@ -103,6 +137,9 @@ public class RoundedButtonImplLollipop
 		if (cornerRadius != mCornerRadius) {
 			mCornerRadius = cornerRadius;
 			mBackgroundDrawable.invalidateSelf();
+			if (mPreventCornerOverlap) {
+				invalidatePadding();
+			}
 		}
 	}
 
@@ -152,6 +189,16 @@ public class RoundedButtonImplLollipop
 				invalidatePadding();
 			}
 		}
+	}
+
+	@Override
+	public boolean isPreventCornerOverlap() {
+		return false;
+	}
+
+	@Override
+	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
+
 	}
 
 	@Override
@@ -219,7 +266,8 @@ public class RoundedButtonImplLollipop
 			right += mMaxElevation;
 			bottom += verticalPadding;
 		}
-		mDelegate.onDrawablePaddingChanged(left, top, right, bottom);
+		int overlay = (mPreventCornerOverlap ? (int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
+		mDelegate.onPaddingChanged(left, top, right, bottom, overlay);
 	}
 
 	static StateListAnimator newStateListAnimator(View view, float pressedTranslationZ) {

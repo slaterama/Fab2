@@ -16,7 +16,6 @@ import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.Rounde
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.newRoundedButtonImpl;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
 
 public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
@@ -28,8 +27,6 @@ public class RoundedButton extends Button
 	boolean mPreventCornerOverlap;
 
 	final Rect mDrawablePadding = new Rect();
-
-	int mOverlayPadding;
 
 	public RoundedButton(Context context) {
 		this(context, null);
@@ -123,31 +120,27 @@ public class RoundedButton extends Button
 
 	@Override
 	public int getContentPaddingLeft() {
-		return mContentPadding.left;
+		return mImpl.getContentPaddingLeft();
 	}
 
 	@Override
 	public int getContentPaddingTop() {
-		return mContentPadding.top;
+		return mImpl.getContentPaddingTop();
 	}
 
 	@Override
 	public int getContentPaddingRight() {
-		return mContentPadding.right;
+		return mImpl.getContentPaddingRight();
 	}
 
 	@Override
 	public int getContentPaddingBottom() {
-		return mContentPadding.bottom;
+		return mImpl.getContentPaddingBottom();
 	}
 
 	@Override
 	public void setContentPadding(int left, int top, int right, int bottom) {
-		if (left != mContentPadding.left || top != mContentPadding.top
-				|| right != mContentPadding.right || bottom != mContentPadding.bottom) {
-			mContentPadding.set(left, top, right, bottom);
-			updatePadding();
-		}
+		mImpl.setContentPadding(left, top, right, bottom);
 	}
 
 	@Override
@@ -158,9 +151,6 @@ public class RoundedButton extends Button
 	@Override
 	public void setCornerRadius(float cornerRadius) {
 		mImpl.setCornerRadius(cornerRadius);
-		mOverlayPadding = (mPreventCornerOverlap
-				? (int) Math.ceil((1 - COS_45) * cornerRadius) : 0);
-		updatePadding();
 	}
 
 	@Override
@@ -200,17 +190,12 @@ public class RoundedButton extends Button
 
 	@Override
 	public boolean isPreventCornerOverlap() {
-		return mPreventCornerOverlap;
+		return mImpl.isPreventCornerOverlap();
 	}
 
 	@Override
 	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
-		if (preventCornerOverlap != mPreventCornerOverlap) {
-			mPreventCornerOverlap = preventCornerOverlap;
-			mOverlayPadding = (mPreventCornerOverlap
-					? (int) Math.ceil((1 - COS_45) * mImpl.getCornerRadius()) : 0);
-			updatePadding();
-		}
+		mImpl.setPreventCornerOverlap(preventCornerOverlap);
 	}
 
 	@Override
@@ -294,17 +279,11 @@ public class RoundedButton extends Button
 	}
 
 	@Override
-	public void onDrawablePaddingChanged(int left, int top, int right, int bottom) {
-		mDrawablePadding.set(left, top, right, bottom);
-		updatePadding();
-	}
-
-	void updatePadding() {
+	public void onPaddingChanged(int left, int top, int right, int bottom, int overlay) {
 		super.setPadding(
-				mDrawablePadding.left + mOverlayPadding + mContentPadding.left,
-				mDrawablePadding.top + mOverlayPadding + mContentPadding.top,
-				mDrawablePadding.right + mOverlayPadding + mContentPadding.right,
-				mDrawablePadding.bottom + mOverlayPadding + mContentPadding.bottom);
+				left + overlay + mContentPadding.left, top + overlay + mContentPadding.top,
+				right + overlay + mContentPadding.right, bottom + overlay + mContentPadding.bottom);
+		mDrawablePadding.set(left, top, right, bottom);
 		requestLayout();
 	}
 }
