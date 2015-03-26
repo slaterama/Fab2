@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -15,6 +16,7 @@ import com.slaterama.fab2.R;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.getResolvedSize;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.newRoundedButtonImpl;
 
 public class RoundedButton extends Button
@@ -27,6 +29,8 @@ public class RoundedButton extends Button
 	boolean mPreventCornerOverlap;
 
 	final Rect mDrawablePadding = new Rect();
+
+	final Point mResolvedSize = new Point();
 
 	public RoundedButton(Context context) {
 		this(context, null);
@@ -241,36 +245,9 @@ public class RoundedButton extends Button
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-		final float cornerRadius = mImpl.getCornerRadius();
-		final int minWidth = (int) (2 * cornerRadius) +
-				mDrawablePadding.left + mDrawablePadding.right;
-		final int minHeight = (int) (2 * cornerRadius) +
-				mDrawablePadding.top + mDrawablePadding.bottom;
-		final int resolvedWidth;
-		final int resolvedHeight;
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			int measuredWidthAndState = getMeasuredWidthAndState();
-			int measuredHeightAndState = getMeasuredHeightAndState();
-			int measuredWidth = measuredWidthAndState & MEASURED_SIZE_MASK;
-			int measuredWidthState = measuredWidthAndState & MEASURED_STATE_MASK;
-			int measuredHeight = measuredHeightAndState & MEASURED_SIZE_MASK;
-			int measuredHeightState = measuredHeightAndState & MEASURED_STATE_MASK;
-			int resolvedWidthSizeAndState = resolveSizeAndState(
-					Math.max(measuredWidth, minWidth), widthMeasureSpec, measuredWidthState);
-			int resolvedHeightSizeAndState = resolveSizeAndState(
-					Math.max(measuredHeight, minHeight), heightMeasureSpec, measuredHeightState);
-			resolvedWidth = resolvedWidthSizeAndState & MEASURED_SIZE_MASK;
-			resolvedHeight = resolvedHeightSizeAndState & MEASURED_SIZE_MASK;
-		} else {
-			int measuredWidth = getMeasuredWidth();
-			int measuredHeight = getMeasuredHeight();
-			resolvedWidth = resolveSize(Math.max(measuredWidth, minWidth), widthMeasureSpec);
-			resolvedHeight = resolveSize(Math.max(measuredHeight, minHeight), heightMeasureSpec);
-		}
-
-		setMeasuredDimension(resolvedWidth, resolvedHeight);
+		getResolvedSize(this, mImpl.getCornerRadius(), mDrawablePadding,
+				widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
+		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
 	}
 
 	@Override
