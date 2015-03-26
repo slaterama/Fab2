@@ -53,7 +53,6 @@ public class RoundedButtonImplLollipop
 	BackgroundDrawable mBackgroundDrawable;
 
 	public RoundedButtonImplLollipop(RoundedButtonDelegate delegate, RoundedButtonOptions options) {
-		super();
 		mDelegate = delegate;
 		try {
 			mView = (View) delegate;
