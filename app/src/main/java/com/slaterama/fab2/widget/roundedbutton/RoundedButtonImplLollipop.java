@@ -183,7 +183,7 @@ public class RoundedButtonImplLollipop
 	public void setMaxElevation(float maxElevation) {
 		if (maxElevation != mMaxElevation) {
 			mMaxElevation = maxElevation;
-			if (/* Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP || */ mUseCompatPadding) {
+			if (mUseCompatPadding) {
 				mBackgroundDrawable.updateBounds(null);
 				mBackgroundDrawable.invalidateSelf();
 				invalidatePadding();
