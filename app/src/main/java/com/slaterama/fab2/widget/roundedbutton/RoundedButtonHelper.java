@@ -1,6 +1,5 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
-import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -32,21 +31,18 @@ public class RoundedButtonHelper {
 		}
 	}
 
-	final static RoundButtonSizeResolver sSizeResolver;
-
-	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			sSizeResolver = new RoundButtonSizeResolverHoneycomb();
-		} else {
-			sSizeResolver = new RoundButtonSizeResolver();
-		}
-	}
-
 	static void getResolvedSize(View view, float cornerRadius, Rect drawablePadding,
 	                            int widthMeasureSpec, int heightMeasureSpec,
 	                            boolean useMeasuredSize, Point resolvedSize) {
-		sSizeResolver.getResolvedSize(view, cornerRadius, drawablePadding, widthMeasureSpec,
-				heightMeasureSpec, useMeasuredSize, resolvedSize);
+		final int diameter = (int) (2 * cornerRadius);
+		final int minWidth = diameter + drawablePadding.left + drawablePadding.right;
+		final int minHeight = diameter + drawablePadding.top + drawablePadding.bottom;
+		int requestedWidth = (useMeasuredSize
+				? Math.max(minWidth, view.getMeasuredWidth()) : minWidth);
+		int requestedHeight = (useMeasuredSize
+				? Math.max(minHeight, view.getMeasuredHeight()) : minHeight);
+		resolvedSize.set(View.resolveSize(requestedWidth, widthMeasureSpec),
+				View.resolveSize(requestedHeight, heightMeasureSpec));
 	}
 
 	static class RoundedButtonOptions {
@@ -128,61 +124,5 @@ public class RoundedButtonHelper {
 		void setColor(int color);
 
 		Drawable createDrawableWrapper(Drawable source);
-	}
-
-	static class RoundButtonSizeResolver {
-		void getResolvedSize(View view, float cornerRadius, Rect drawablePadding,
-		                     int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
-		                     Point resolvedSize) {
-			final int diameter = (int) (2 * cornerRadius);
-			final int minWidth = diameter + drawablePadding.left + drawablePadding.right;
-			final int minHeight = diameter + drawablePadding.top + drawablePadding.bottom;
-			getResolvedSize(view, minWidth, minHeight, widthMeasureSpec, heightMeasureSpec,
-					useMeasuredSize, resolvedSize);
-		}
-
-		void getResolvedSize(View view, int minWidth, int minHeight, int widthMeasureSpec,
-		                     int heightMeasureSpec, boolean useMeasuredSize, Point resolvedSize) {
-			final int requestedWidth;
-			final int requestedHeight;
-			if (useMeasuredSize) {
-				requestedWidth = Math.max(minWidth, view.getMeasuredWidth());
-				requestedHeight = Math.max(minHeight, view.getMeasuredHeight());
-			} else {
-				requestedWidth = minWidth;
-				requestedHeight= minHeight;
-			}
-			resolvedSize.set(View.resolveSize(requestedWidth, widthMeasureSpec),
-					View.resolveSize(requestedHeight, heightMeasureSpec));
-		}
-	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	static class RoundButtonSizeResolverHoneycomb extends RoundButtonSizeResolver {
-		@Override
-		void getResolvedSize(View view, int minWidth, int minHeight, int widthMeasureSpec,
-		                     int heightMeasureSpec, boolean useMeasuredSize, Point resolvedSize) {
-			final int requestedWidth;
-			final int requestedHeight;
-			int measuredWidthAndState = view.getMeasuredWidthAndState();
-			int measuredHeightAndState = view.getMeasuredHeightAndState();
-			int measuredWidthState = measuredWidthAndState & View.MEASURED_STATE_MASK;
-			int measuredHeightState = measuredHeightAndState & View.MEASURED_STATE_MASK;
-			if (useMeasuredSize) {
-				requestedWidth = Math.max(minWidth,
-						measuredWidthAndState & View.MEASURED_SIZE_MASK);
-				requestedHeight = Math.max(minHeight,
-						measuredHeightAndState & View.MEASURED_SIZE_MASK);
-			} else {
-				requestedWidth = minWidth;
-				requestedHeight= minHeight;
-			}
-			int resolvedWidthSizeAndState = View.resolveSizeAndState(
-					requestedWidth, widthMeasureSpec, measuredWidthState);
-			int resolvedHeightSizeAndState = View.resolveSizeAndState(
-					requestedHeight, heightMeasureSpec, measuredHeightState);
-			resolvedSize.set(resolvedWidthSizeAndState & View.MEASURED_SIZE_MASK,
-					resolvedHeightSizeAndState & View.MEASURED_SIZE_MASK);
-		}
 	}
 }

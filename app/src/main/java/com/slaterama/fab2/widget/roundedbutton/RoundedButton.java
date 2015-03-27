@@ -25,6 +25,8 @@ public class RoundedButton extends Button
 
 	final Rect mContentPadding = new Rect();
 
+	float mCornerRadius;
+
 	boolean mPreventCornerOverlap;
 
 	final Rect mDrawablePadding = new Rect();
@@ -65,8 +67,9 @@ public class RoundedButton extends Button
 				R.styleable.RoundedButton_qslib_contentPaddingRight, defaultContentPadding);
 		mContentPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPaddingBottom, defaultContentPadding);
-		options.cornerRadius = a.getDimension(R.styleable.RoundedButton_qslib_cornerRadius,
+		mCornerRadius = a.getDimension(R.styleable.RoundedButton_qslib_cornerRadius,
 				options.cornerRadius);
+		options.cornerRadius = mCornerRadius;
 		options.elevation = a.getDimension(R.styleable.RoundedButton_qslib_elevation,
 				options.elevation);
 		int defaultInsetPadding = a.getDimensionPixelOffset(
@@ -148,12 +151,13 @@ public class RoundedButton extends Button
 
 	@Override
 	public float getCornerRadius() {
-		return mImpl.getCornerRadius();
+		return mCornerRadius;
 	}
 
 	@Override
 	public void setCornerRadius(float cornerRadius) {
 		mImpl.setCornerRadius(cornerRadius);
+		mCornerRadius = cornerRadius;
 	}
 
 	@Override
@@ -244,7 +248,7 @@ public class RoundedButton extends Button
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		getResolvedSize(this, mImpl.getCornerRadius(), mDrawablePadding,
+		getResolvedSize(this, mCornerRadius, mDrawablePadding,
 				widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
 		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
 	}

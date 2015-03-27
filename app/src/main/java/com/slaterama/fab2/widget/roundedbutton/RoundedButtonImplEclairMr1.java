@@ -3,7 +3,6 @@ package com.slaterama.fab2.widget.roundedbutton;
 import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -14,14 +13,11 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Build;
 import android.util.Log;
-import android.util.StateSet;
 
 import com.slaterama.fab2.R;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.PRESSED_SPECS;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.BASE_SPECS;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SHADOW_MULTIPLIER;
 
 @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
