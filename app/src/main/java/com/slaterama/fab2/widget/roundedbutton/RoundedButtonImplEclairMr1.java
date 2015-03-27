@@ -1,56 +1,39 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
 import android.annotation.TargetApi;
-import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.view.View;
+
+import com.slaterama.fab2.R;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonImpl;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
 
 @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
-public class RoundedButtonImplEclairMr1
-		implements RoundedButtonImpl {
+public class RoundedButtonImplEclairMr1 extends RoundedButtonImplBase {
 
-	RoundedButtonDelegate mDelegate;
-	View mView;
-	ColorStateList mColor;
-	Rect mContentPadding;
-	float mCornerRadius;
 	float mElevation;
-	Rect mInsetPadding;
-	float mMaxElevation;
-	float mPressedTranslationZ;
-	boolean mPreventCornerOverlap;
 	float mTranslationZ;
-	boolean mUseCompatAnimation;
-	boolean mUseCompatPadding;
 
-	BackgroundDrawable mBackgroundDrawable;
+	private final long mAnimDuration;
+	private final int mShadowStartColor;
+	private final int mShadowEndColor;
+	final float mInsetShadowExtra;
+
+	private final Paint mPaint;
+	private final Paint mCornerShadowPaint;
+	private final Paint mEdgeShadowPaint;
+	private final Paint mSolidPaint;
 
 	public RoundedButtonImplEclairMr1(RoundedButtonDelegate delegate,
 	                                  RoundedButtonOptions options) {
-		mDelegate = delegate;
-		try {
-			mView = (View) delegate;
-		} catch (ClassCastException e) {
-			throw new ClassCastException("delegate must be of type View");
-		}
-		mColor = options.color;
-		mContentPadding = options.contentPadding;
-		mCornerRadius = options.cornerRadius;
+		super(delegate, options);
 		mElevation = options.elevation;
-		mInsetPadding = options.insetPadding;
-		mMaxElevation = options.maxElevation;
-		mPressedTranslationZ = options.pressedTranslationZ;
-		mPreventCornerOverlap = options.preventCornerOverlap;
 		mTranslationZ = options.translationZ;
-		mUseCompatAnimation = options.useCompatAnimation;
 		/*
 		// TODO Set up animations
 		if (mUseCompatAnimation) {
@@ -58,168 +41,98 @@ public class RoundedButtonImplEclairMr1
 			mView.setStateListAnimator(newStateListAnimator(mView, mPressedTranslationZ));
 		}
 		*/
-		mUseCompatPadding = options.useCompatPadding;
-		mBackgroundDrawable = new BackgroundDrawable();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			mView.setBackground(mBackgroundDrawable);
-		} else {
-			mView.setBackgroundDrawable(mBackgroundDrawable);
-		}
-		invalidatePadding();
+
+		Resources resources = mView.getResources();
+		mAnimDuration = resources.getInteger(R.integer.qslib_button_pressed_animation_duration);
+		mShadowStartColor = resources.getColor(R.color.qslib_button_shadow_start_color);
+		mShadowEndColor = resources.getColor(R.color.qslib_button_shadow_end_color);
+		mInsetShadowExtra = resources.getDimension(R.dimen.qslib_button_compat_inset_shadow);
+
+		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+		mCornerShadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+		mSolidPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+		mPaint.setColor(options.color.getDefaultColor());
+
+		mCornerShadowPaint.setStyle(Paint.Style.FILL);
+		mCornerShadowPaint.setDither(true);
+		mEdgeShadowPaint = new Paint(mCornerShadowPaint);
+
+		mSolidPaint.setColor(mShadowStartColor);
+		mSolidPaint.setStyle(Paint.Style.FILL);
+		mSolidPaint.setDither(true);
 	}
 
 	@Override
-	public ColorStateList getColor() {
-		return null;
+	BackgroundDrawableBase createBackgroundDrawable() {
+		return new BackgroundDrawable();
 	}
 
 	@Override
-	public void setColor(ColorStateList color) {
-
-	}
-
-	@Override
-	public int getContentPaddingLeft() {
-		return 0;
-	}
-
-	@Override
-	public int getContentPaddingTop() {
-		return 0;
-	}
-
-	@Override
-	public int getContentPaddingRight() {
-		return 0;
-	}
-
-	@Override
-	public int getContentPaddingBottom() {
-		return 0;
-	}
-
-	@Override
-	public void setContentPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-
-	}
-
-	@Override
-	public float getCornerRadius() {
-		return 0;
-	}
-
-	@Override
-	public void setCornerRadius(float cornerRadius) {
-
-	}
-
-	@Override
-	public int getInsetPaddingLeft() {
-		return 0;
-	}
-
-	@Override
-	public int getInsetPaddingTop() {
-		return 0;
-	}
-
-	@Override
-	public int getInsetPaddingRight() {
-		return 0;
-	}
-
-	@Override
-	public int getInsetPaddingBottom() {
-		return 0;
-	}
-
-	@Override
-	public void setInsetPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-
-	}
-
-	@Override
-	public float getMaxElevation() {
-		return 0;
-	}
-
-	@Override
-	public void setMaxElevation(float maxElevation) {
-
-	}
-
-	@Override
-	public boolean isPreventCornerOverlap() {
+	boolean willWrapBackgroundDrawable() {
 		return false;
-	}
-
-	@Override
-	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
-
 	}
 
 	@Override
 	public float getSupportElevation() {
-		return 0;
+		return mElevation;
 	}
 
 	@Override
 	public void setSupportElevation(float elevation) {
-
+		if (elevation != mElevation) {
+			mElevation = elevation;
+			mBackgroundDrawable.invalidateSelf();
+		}
 	}
 
 	@Override
 	public float getSupportTranslationZ() {
-		return 0;
+		return mTranslationZ;
 	}
 
 	@Override
 	public void setSupportTranslationZ(float translationZ) {
-
+		if (translationZ != mTranslationZ) {
+			mTranslationZ = translationZ;
+			mBackgroundDrawable.invalidateSelf();
+		}
 	}
 
 	@Override
-	public boolean isUseCompatAnimation() {
-		return false;
+	protected boolean shouldUseCompatAnimation() {
+		return true;
 	}
 
 	@Override
-	public void setUseCompatAnimation(boolean useCompatAnimation) {
-
+	protected boolean shouldUseCompatPadding() {
+		return true;
 	}
 
-	@Override
-	public boolean isUseCompatPadding() {
-		return false;
-	}
-
-	@Override
-	public void setUseCompatPadding(boolean useCompatPadding) {
-
-	}
-
-	void invalidatePadding() {
-
-	}
-
-	class BackgroundDrawable extends Drawable {
+	class BackgroundDrawable extends BackgroundDrawableBase {
 		@Override
 		public void setAlpha(int alpha) {
-
+			mPaint.setAlpha(alpha);
+			mCornerShadowPaint.setAlpha(alpha);
+			mEdgeShadowPaint.setAlpha(alpha);
+			mSolidPaint.setAlpha(alpha);
 		}
 
 		@Override
 		public void setColorFilter(ColorFilter cf) {
-
-		}
-
-		@Override
-		public int getOpacity() {
-			return 0;
+			mPaint.setColorFilter(cf);
+			mCornerShadowPaint.setColorFilter(cf);
+			mEdgeShadowPaint.setColorFilter(cf);
+			mSolidPaint.setColorFilter(cf);
 		}
 
 		@Override
 		public void draw(Canvas canvas) {
+
+		}
+
+		@Override
+		public void updateBounds(Rect bounds) {
 
 		}
 	}

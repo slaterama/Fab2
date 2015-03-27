@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<dimen name="qslib_rounded_btn_compat_inset_shadow">1dp</dimen>
+	<!-- Inset shadow for RoundedButtonCompat. It is used to avoid gaps between the button and the
+	shadow. -->
+	<dimen name="qslib_button_compat_inset_shadow">1dp</dimen>
+
 	<dimen name="qslib_rounded_btn_content_padding_vertical">4dp</dimen>
 	<dimen name="qslib_rounded_btn_content_padding_horizontal">8dp</dimen>
 	<dimen name="qslib_rounded_btn_corner_radius">2dp</dimen>
@@ -13,7 +16,6 @@
 	<dimen name="qslib_rounded_btn_pressed_translation_z">4dp</dimen>
 	<dimen name="qslib_rounded_btn_translation_z">0dp</dimen>
 
-	<dimen name="qslib_fab_compat_inset_shadow">1dp</dimen>
 	<dimen name="qslib_fab_content_padding_vertical">0dp</dimen>
 	<dimen name="qslib_fab_content_padding_horizontal">0dp</dimen>
 	<dimen name="qslib_fab_corner_radius">28dp</dimen>
