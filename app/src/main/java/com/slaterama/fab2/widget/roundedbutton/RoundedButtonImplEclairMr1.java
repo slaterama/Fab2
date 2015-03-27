@@ -159,9 +159,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			canvas.translate(0, dy);
 			drawShadow(canvas);
 			canvas.translate(0, -dy);
-// TODO !!!!			GraphicsCompat.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
-			Log.d("RoundedButton", "Here in draw!!");
-			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
 		@Override

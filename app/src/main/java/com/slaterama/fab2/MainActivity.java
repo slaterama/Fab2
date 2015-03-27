@@ -21,16 +21,16 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		mRoundedButton = (RoundedButton) findViewById(R.id.roundedbutton);
+		mButton = (Button) findViewById(R.id.button);
+		mCheckBox = (CheckBox) findViewById(R.id.checkbox);
+		mCheckBox.setChecked(mRoundedButton.isEnabled());
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
-		mRoundedButton = (RoundedButton) findViewById(R.id.roundedbutton);
-		mButton = (Button) findViewById(R.id.button);
-		mCheckBox = (CheckBox) findViewById(R.id.checkbox);
-		mCheckBox.setChecked(mRoundedButton.isEnabled());
 		return true;
 	}
 

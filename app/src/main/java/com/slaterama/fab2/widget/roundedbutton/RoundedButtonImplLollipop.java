@@ -153,7 +153,7 @@ public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 
 		@Override
 		public void draw(Canvas canvas) {
-			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
 		@Override
