@@ -7,12 +7,11 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonBase;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SHADOW_MULTIPLIER;
 
@@ -265,8 +264,6 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 
 		@Override
 		public boolean isStateful() {
-			boolean stateful = mColor.isStateful();
-			Log.d("RoundedButton", String.format("isStateful=%b", stateful));
 			return mColor.isStateful();
 		}
 
@@ -279,8 +276,6 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 		@Override
 		protected boolean onStateChange(int[] state) {
 			int color = mColor.getColorForState(state, mColor.getDefaultColor());
-			int paintColor = mPaint.getColor();
-			Log.d("RoundedButton", String.format("color=%d, paintColor=%d", color, paintColor));
 			if (color != mPaint.getColor()) {
 				mPaint.setColor(color);
 				invalidateSelf();

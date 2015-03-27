@@ -143,6 +143,13 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 
 		@Override
+		protected boolean onStateChange(int[] state) {
+			boolean retVal = super.onStateChange(state);
+			// TODO Handle animations
+			return retVal;
+		}
+
+		@Override
 		public void draw(Canvas canvas) {
 			if (mShadowDirty) {
 				mShadowDirty = false;
@@ -154,7 +161,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			canvas.translate(0, -dy);
 // TODO !!!!			GraphicsCompat.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 			Log.d("RoundedButton", "Here in draw!!");
-//			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
 		@Override
@@ -174,11 +181,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		void buildShadowCorners() {
 			if (mShadowSize > 0f) {
-
-				// TODO NEXT Make this fill in entire shadow -- requires 2 steps?
-
-				float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
-				float innerRadius = Math.max(mCornerRadius - insetShadow, 0.0f);
+				//float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
+				float innerRadius = 0f; //Math.max(mCornerRadius - insetShadow, 0.0f);
 				float outerRadius = mCornerRadius + mShadowSize;
 				RectF innerBounds = new RectF(-innerRadius, -innerRadius, innerRadius, innerRadius);
 				RectF outerBounds = new RectF(-outerRadius, -outerRadius, outerRadius, outerRadius);
@@ -217,9 +221,9 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		void drawShadow(Canvas canvas) {
 			if (mShadowSize > 0) {
-				float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
+				//float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
 				final float edgeShadowTop = -mCornerRadius - mShadowSize;
-				final float edgeShadowBottom = Math.min(-mCornerRadius + insetShadow, 0.0f);
+				final float edgeShadowBottom = 0f; //Math.min(-mCornerRadius + insetShadow, 0.0f);
 				float inset = mCornerRadius;
 				final boolean drawHorizontalEdges = mBoundsF.width() > 2 * mCornerRadius;
 				final boolean drawVerticalEdges = mBoundsF.height() > 2 * mCornerRadius;
@@ -271,7 +275,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				if (drawHorizontalEdges && drawVerticalEdges) {
 					saved = canvas.save();
 					canvas.translate(mBoundsF.left + inset, mBoundsF.top + inset);
-					canvas.drawRect(0, 0,
+					canvas.drawRect(0f, 0f,
 							mBoundsF.width() - 2 * inset, mBoundsF.height() - 2 * inset,
 							mSolidPaint);
 					canvas.restoreToCount(saved);
