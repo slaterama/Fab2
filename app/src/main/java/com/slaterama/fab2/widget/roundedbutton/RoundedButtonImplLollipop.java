@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Outline;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -29,7 +28,7 @@ import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.Rounde
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SHADOW_MULTIPLIER;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class RoundedButtonImplLollipop extends RoundedButtonImplBase {
+public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 
 	StateListAnimator mSavedStateListAnimator;
 

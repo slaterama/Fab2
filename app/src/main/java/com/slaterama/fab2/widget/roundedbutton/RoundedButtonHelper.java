@@ -130,9 +130,6 @@ public class RoundedButtonHelper {
 		Drawable createDrawableWrapper(Drawable source);
 	}
 
-	interface RoundedButtonImpl extends RoundedButtonBase {
-	}
-
 	static class RoundButtonSizeResolver {
 		void getResolvedSize(View view, float cornerRadius, Rect drawablePadding,
 		                     int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
