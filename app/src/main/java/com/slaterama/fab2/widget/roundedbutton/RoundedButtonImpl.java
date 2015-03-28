@@ -11,23 +11,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.COS_45;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonBase;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SHADOW_MULTIPLIER;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.*;
 
 public abstract class RoundedButtonImpl implements RoundedButtonBase {
-
-	static RoundRectHelper sRoundRectHelper;
-
-	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			sRoundRectHelper = new RoundRectHelperJellybeanMr1();
-		} else {
-			sRoundRectHelper = new RoundRectHelperEclairMr1();
-		}
-	}
 
 	RoundedButtonDelegate mDelegate;
 	View mView;
@@ -42,6 +28,7 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 	boolean mUseCompatPadding;
 
 	BackgroundDrawableBase mBackgroundDrawable;
+	ShadowAnimationHelper mShadowAnimationHelper;
 
 	public RoundedButtonImpl(RoundedButtonDelegate delegate, RoundedButtonOptions options) {
 		mDelegate = delegate;
@@ -67,6 +54,7 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 		} else {
 			mView.setBackgroundDrawable(drawable);
 		}
+		mShadowAnimationHelper = ShadowAnimationHelper.newInstance(mDelegate);
 		invalidatePadding();
 	}
 
@@ -253,6 +241,8 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 
 	public abstract class BackgroundDrawableBase extends Drawable {
 		final Paint mPaint;
+		final RectF mBoundsF = new RectF();
+		final Rect mBoundsI = new Rect();
 
 		public BackgroundDrawableBase() {
 			super();
@@ -297,54 +287,24 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 			}
 		}
 
+		@Override
+		public void draw(Canvas canvas) {
+			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+		}
+
 		public void updateBounds(Rect bounds) {
-
-		}
-	}
-
-	interface RoundRectHelper {
-		void drawRoundRect(Canvas canvas, RectF bounds, float rx, float ry, Paint paint);
-	}
-
-	static class RoundRectHelperEclairMr1 implements RoundRectHelper {
-		private final RectF mCornerRect = new RectF();
-
-		@Override
-		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint) {
-			// Draws a round rect using 7 draw operations. This is faster than using
-			// canvas.drawRoundRect before JBMR1 because API 11-16 used alpha mask textures to draw
-			// shapes.
-			if (rect != null) {
-				final float twoRx = rx * 2;
-				final float twoRy = ry * 2;
-				final float innerWidth = rect.width() - twoRx;
-				final float innerHeight = rect.height() - twoRy;
-				mCornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
-
-				canvas.drawArc(mCornerRect, 180, 90, true, paint);
-				mCornerRect.offset(innerWidth, 0);
-				canvas.drawArc(mCornerRect, 270, 90, true, paint);
-				mCornerRect.offset(0, innerHeight);
-				canvas.drawArc(mCornerRect, 0, 90, true, paint);
-				mCornerRect.offset(-innerWidth, 0);
-				canvas.drawArc(mCornerRect, 90, 90, true, paint);
-
-				//draw top and bottom pieces
-				canvas.drawRect(rect.left + rx, rect.top, rect.right - rx, rect.top + ry, paint);
-				canvas.drawRect(rect.left + rx, rect.bottom - ry, rect.right - rx, rect.bottom,
-						paint);
-
-				//center
-				canvas.drawRect(rect.left, (float) Math.floor(rect.top + ry), rect.right,
-						(float) Math.ceil(rect.bottom - ry), paint);
+			if (bounds == null) {
+				bounds = getBounds();
 			}
-		}
-	}
-
-	static class RoundRectHelperJellybeanMr1 implements RoundRectHelper {
-		@Override
-		public void drawRoundRect(Canvas canvas, RectF bounds, float rx, float ry, Paint paint) {
-			canvas.drawRoundRect(bounds, rx, ry, paint);
+			mBoundsI.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
+					bounds.right - mInsetPadding.right, bounds.bottom - mInsetPadding.bottom);
+			mBoundsF.set(mBoundsI);
+			if (mUseCompatPadding) {
+				int paddingHorizontal = (int) Math.ceil(mMaxElevation);
+				int paddingVertical = (int) Math.ceil(mMaxElevation * SHADOW_MULTIPLIER);
+				mBoundsI.inset(paddingHorizontal, paddingVertical);
+				mBoundsF.set(mBoundsI);
+			}
 		}
 	}
 }

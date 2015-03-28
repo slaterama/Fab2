@@ -1,10 +1,14 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.StateSet;
 import android.view.View;
 
 public class RoundedButtonHelper {
@@ -12,20 +16,30 @@ public class RoundedButtonHelper {
 	static int[] PRESSED_SPECS = new int[]{android.R.attr.state_pressed,
 			android.R.attr.state_enabled};
 	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
+	static int[][] SPECS_ARRAY = new int[][]{PRESSED_SPECS, BASE_SPECS, StateSet.WILD_CARD};
 
 	static String ELEVATION_PROPERTY = "elevation";
+	static String TRANSLATION_Z_PROPERTY = "translationZ";
 
 	static final float SHADOW_MULTIPLIER = 1.5f;
 
 	// used to calculate overlap padding
 	static final double COS_45 = Math.cos(Math.toRadians(45));
 
+	final static RoundRectHelper sRoundRectHelper;
+
+	static {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			sRoundRectHelper = new RoundRectHelperJellybeanMr1();
+		} else {
+			sRoundRectHelper = new RoundRectHelperEclairMr1();
+		}
+	}
+
 	static RoundedButtonImpl newRoundedButtonImpl(RoundedButtonDelegate delegate,
 	                                              RoundedButtonOptions options) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			return new RoundedButtonImplLollipop(delegate, options);
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			return new RoundedButtonImplJellybeanMr1(delegate, options);
 		} else {
 			return new RoundedButtonImplEclairMr1(delegate, options);
 		}
@@ -124,5 +138,51 @@ public class RoundedButtonHelper {
 		void setColor(int color);
 
 		Drawable createDrawableWrapper(Drawable source);
+	}
+
+	interface RoundRectHelper {
+		void drawRoundRect(Canvas canvas, RectF bounds, float rx, float ry, Paint paint);
+	}
+
+	static class RoundRectHelperEclairMr1 implements RoundRectHelper {
+		private final RectF mCornerRect = new RectF();
+
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint) {
+			// Draws a round rect using 7 draw operations. This is faster than using
+			// canvas.drawRoundRect before JBMR1 because API 11-16 used alpha mask textures to draw
+			// shapes.
+			if (rect != null) {
+				final float twoRx = rx * 2;
+				final float twoRy = ry * 2;
+				final float innerWidth = rect.width() - twoRx;
+				final float innerHeight = rect.height() - twoRy;
+				mCornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
+
+				canvas.drawArc(mCornerRect, 180, 90, true, paint);
+				mCornerRect.offset(innerWidth, 0);
+				canvas.drawArc(mCornerRect, 270, 90, true, paint);
+				mCornerRect.offset(0, innerHeight);
+				canvas.drawArc(mCornerRect, 0, 90, true, paint);
+				mCornerRect.offset(-innerWidth, 0);
+				canvas.drawArc(mCornerRect, 90, 90, true, paint);
+
+				//draw top and bottom pieces
+				canvas.drawRect(rect.left + rx, rect.top, rect.right - rx, rect.top + ry, paint);
+				canvas.drawRect(rect.left + rx, rect.bottom - ry, rect.right - rx, rect.bottom,
+						paint);
+
+				//center
+				canvas.drawRect(rect.left, (float) Math.floor(rect.top + ry), rect.right,
+						(float) Math.ceil(rect.bottom - ry), paint);
+			}
+		}
+	}
+
+	static class RoundRectHelperJellybeanMr1 implements RoundRectHelper {
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF bounds, float rx, float ry, Paint paint) {
+			canvas.drawRoundRect(bounds, rx, ry, paint);
+		}
 	}
 }

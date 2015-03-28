@@ -1,5 +1,7 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -12,9 +14,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Build;
-import android.util.Log;
 
 import com.slaterama.fab2.R;
+
+import java.util.Set;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonOptions;
@@ -26,6 +29,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	float mElevation;
 	float mTranslationZ;
 	float mShadowSize;
+	float mTargetShadowSize;
 
 	private final long mAnimDuration;
 	private final int mShadowStartColor;
@@ -38,6 +42,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	private final Paint mSolidPaint;
 
 	boolean mShadowDirty = true;
+
+	AnimatorSet mAnimator;
 	
 	public RoundedButtonImplEclairMr1(RoundedButtonDelegate delegate,
 	                                  RoundedButtonOptions options) {
@@ -123,7 +129,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	}
 
 	class BackgroundDrawable extends BackgroundDrawableBase {
-		final RectF mBoundsF = new RectF();
 		Path mCornerShadowPath;
 
 		@Override
@@ -159,7 +164,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			canvas.translate(0, dy);
 			drawShadow(canvas);
 			canvas.translate(0, -dy);
-			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			super.draw(canvas);
 		}
 
 		@Override
