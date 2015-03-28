@@ -1,4 +1,4 @@
-package com.slaterama.fab2.widget.roundedbutton;
+package com.slaterama.fab2.widget.roundedbutton_old;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -10,12 +10,12 @@ import android.view.View;
 
 import com.slaterama.fab2.R;
 
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.RoundedButtonDelegate;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.BASE_SPECS;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.ELEVATION_PROPERTY;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.PRESSED_SPECS;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.SPECS_ARRAY;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.TRANSLATION_Z_PROPERTY;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.RoundedButtonDelegate;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.BASE_SPECS;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.ELEVATION_PROPERTY;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.PRESSED_SPECS;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.SPECS_ARRAY;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.TRANSLATION_Z_PROPERTY;
 
 public abstract class ShadowAnimationHelper {
 

@@ -1,23 +1,37 @@
-package com.slaterama.fab2.widget.roundedbutton;
+package com.slaterama.fab2.widget.roundedbutton_old;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.Button;
 
 import com.slaterama.fab2.R;
 
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonDelegate;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonOptions;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.RoundedButtonDelegate;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.RoundedButtonOptions;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.getResolvedSize;
+import static com.slaterama.fab2.widget.roundedbutton_old.RoundedButtonHelper.newRoundedButtonImpl;
 
 public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
 
 	RoundedButtonImpl mImpl;
+
+	final Rect mContentPadding = new Rect();
+
+	float mCornerRadius;
+
+	boolean mPreventCornerOverlap;
+
+	final Rect mDrawablePadding = new Rect();
+
+	final Point mResolvedSize = new Point();
 
 	public RoundedButton(Context context) {
 		this(context, null);
@@ -39,28 +53,23 @@ public class RoundedButton extends Button
 	}
 
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		RoundedButtonOptions options = newOptions(context, attrs, defStyleAttr, defStyleRes);
-		mImpl = RoundedButtonImpl.newInstance(this, options);
-	}
-
-	RoundedButtonOptions newOptions(Context context, AttributeSet attrs, int defStyleAttr,
-	                                int defStyleRes) {
-		RoundedButtonOptions options = new RoundedButtonOptions();
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedButton,
 				defStyleAttr, defStyleRes);
+		RoundedButtonOptions options = new RoundedButtonOptions();
 		options.color = a.getColorStateList(R.styleable.RoundedButton_qslib_buttonColor);
 		int defaultContentPadding = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPadding, 0);
-		options.contentPadding.left = a.getDimensionPixelOffset(
+		mContentPadding.left = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPaddingLeft, defaultContentPadding);
-		options.contentPadding.top = a.getDimensionPixelOffset(
+		mContentPadding.top = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPaddingTop, defaultContentPadding);
-		options.contentPadding.right = a.getDimensionPixelOffset(
+		mContentPadding.right = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPaddingRight, defaultContentPadding);
-		options.contentPadding.bottom = a.getDimensionPixelOffset(
+		mContentPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPaddingBottom, defaultContentPadding);
-		options.cornerRadius = a.getDimension(R.styleable.RoundedButton_qslib_cornerRadius,
+		mCornerRadius = a.getDimension(R.styleable.RoundedButton_qslib_cornerRadius,
 				options.cornerRadius);
+		options.cornerRadius = mCornerRadius;
 		options.elevation = a.getDimension(R.styleable.RoundedButton_qslib_elevation,
 				options.elevation);
 		int defaultInsetPadding = a.getDimensionPixelOffset(
@@ -77,136 +86,184 @@ public class RoundedButton extends Button
 				options.maxElevation);
 		options.pressedTranslationZ = a.getDimension(
 				R.styleable.RoundedButton_qslib_pressedTranslationZ, options.pressedTranslationZ);
-		options.preventCornerOverlap = a.getBoolean(
-				R.styleable.RoundedButton_qslib_preventCornerOverlap, options.preventCornerOverlap);
 		options.translationZ = a.getDimension(R.styleable.RoundedButton_qslib_translationZ,
 				options.translationZ);
 		options.useCompatAnimation = a.getBoolean(
 				R.styleable.RoundedButton_qslib_useCompatAnimation, options.useCompatAnimation);
 		options.useCompatPadding = a.getBoolean(
 				R.styleable.RoundedButton_qslib_useCompatPadding, options.useCompatPadding);
+		mImpl = newRoundedButtonImpl(this, options);
+		boolean preventCornerOverlap = a.getBoolean(
+				R.styleable.RoundedButton_qslib_preventCornerOverlap, mPreventCornerOverlap);
 		a.recycle();
-		return options;
+		setPreventCornerOverlap(preventCornerOverlap);
 	}
 
+	@Override
+	public void setPadding(int left, int top, int right, int bottom) {
+		// NO OP
+	}
+
+	@Override
+	public void setPaddingRelative(int start, int top, int end, int bottom) {
+		// NO OP
+	}
+
+	@Override
 	public ColorStateList getColor() {
 		return mImpl.getColor();
 	}
 
+	@Override
+	public void setColor(int color) {
+		setColor(ColorStateList.valueOf(color));
+	}
+
+	@Override
 	public void setColor(ColorStateList color) {
 		mImpl.setColor(color);
 	}
 
-	public void setColor(int color) {
-		mImpl.setColor(ColorStateList.valueOf(color));
-	}
-
+	@Override
 	public int getContentPaddingLeft() {
-		return mImpl.getContentPadding().left;
+		return mImpl.getContentPaddingLeft();
 	}
 
+	@Override
 	public int getContentPaddingTop() {
-		return mImpl.getContentPadding().top;
+		return mImpl.getContentPaddingTop();
 	}
 
+	@Override
 	public int getContentPaddingRight() {
-		return mImpl.getContentPadding().right;
+		return mImpl.getContentPaddingRight();
 	}
 
+	@Override
 	public int getContentPaddingBottom() {
-		return mImpl.getContentPadding().bottom;
+		return mImpl.getContentPaddingBottom();
 	}
 
-	public void setContentPadding(Rect contentPadding) {
-		mImpl.setContentPadding(contentPadding);
+	@Override
+	public void setContentPadding(int left, int top, int right, int bottom) {
+		mImpl.setContentPadding(left, top, right, bottom);
 	}
 
+	@Override
 	public float getCornerRadius() {
-		return mImpl.getCornerRadius();
+		return mCornerRadius;
 	}
 
+	@Override
 	public void setCornerRadius(float cornerRadius) {
 		mImpl.setCornerRadius(cornerRadius);
+		mCornerRadius = cornerRadius;
 	}
 
-	public float getSupportElevation() {
-		return mImpl.getElevation();
-	}
-
-	public void setSupportElevation(float elevation) {
-		mImpl.setElevation(elevation);
-	}
-
+	@Override
 	public int getInsetPaddingLeft() {
-		return mImpl.getInsetPadding().left;
+		return mImpl.getInsetPaddingLeft();
 	}
 
+	@Override
 	public int getInsetPaddingTop() {
-		return mImpl.getInsetPadding().top;
+		return mImpl.getInsetPaddingTop();
 	}
 
+	@Override
 	public int getInsetPaddingRight() {
-		return mImpl.getInsetPadding().right;
+		return mImpl.getInsetPaddingRight();
 	}
 
+	@Override
 	public int getInsetPaddingBottom() {
-		return mImpl.getInsetPadding().bottom;
+		return mImpl.getInsetPaddingBottom();
 	}
 
-	public void setInsetPadding(Rect insetPadding) {
-		mImpl.setInsetPadding(insetPadding);
+	@Override
+	public void setInsetPadding(int left, int top, int right, int bottom) {
+		mImpl.setInsetPadding(left, top, right, bottom);
 	}
 
+	@Override
 	public float getMaxElevation() {
 		return mImpl.getMaxElevation();
 	}
 
+	@Override
 	public void setMaxElevation(float maxElevation) {
 		mImpl.setMaxElevation(maxElevation);
 	}
 
-	public float getPressedTranslationZ() {
-		return mImpl.getPressedTranslationZ();
-	}
-
-	public void setPressedTranslationZ(float pressedTranslationZ) {
-		mImpl.setPressedTranslationZ(pressedTranslationZ);
-	}
-
+	@Override
 	public boolean isPreventCornerOverlap() {
 		return mImpl.isPreventCornerOverlap();
 	}
 
+	@Override
 	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
 		mImpl.setPreventCornerOverlap(preventCornerOverlap);
 	}
 
+	@Override
+	public float getSupportElevation() {
+		return mImpl.getSupportElevation();
+	}
+
+	@Override
+	public void setSupportElevation(float elevation) {
+		mImpl.setSupportElevation(elevation);
+	}
+
+	@Override
 	public float getSupportTranslationZ() {
-		return mImpl.getTranslationZ();
+		return mImpl.getSupportTranslationZ();
 	}
 
+	@Override
 	public void setSupportTranslationZ(float translationZ) {
-		mImpl.setTranslationZ(translationZ);
+		mImpl.setSupportTranslationZ(translationZ);
 	}
 
+	@Override
 	public boolean isUseCompatAnimation() {
 		return mImpl.isUseCompatAnimation();
 	}
 
+	@Override
 	public void setUseCompatAnimation(boolean useCompatAnimation) {
 		mImpl.setUseCompatAnimation(useCompatAnimation);
 	}
 
+	@Override
 	public boolean isUseCompatPadding() {
 		return mImpl.isUseCompatPadding();
 	}
 
+	@Override
 	public void setUseCompatPadding(boolean useCompatPadding) {
 		mImpl.setUseCompatPadding(useCompatPadding);
 	}
 
 	@Override
-	public void onPaddingChanged(int left, int top, int right, int bottom) {
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		getResolvedSize(this, mCornerRadius, mDrawablePadding,
+				widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
+		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
+	}
 
+	@Override
+	public Drawable createDrawableWrapper(Drawable source) {
+		return null;
+	}
+
+	@Override
+	public void onPaddingChanged(int left, int top, int right, int bottom, int overlay) {
+		super.setPadding(
+				left + overlay + mContentPadding.left, top + overlay + mContentPadding.top,
+				right + overlay + mContentPadding.right, bottom + overlay + mContentPadding.bottom);
+		mDrawablePadding.set(left, top, right, bottom);
+		requestLayout();
 	}
 }

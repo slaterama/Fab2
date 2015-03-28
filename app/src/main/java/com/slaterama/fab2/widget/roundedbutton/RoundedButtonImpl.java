@@ -11,252 +11,181 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonHelper.*;
+public abstract class RoundedButtonImpl {
 
-public abstract class RoundedButtonImpl implements RoundedButtonBase {
+	static final float SHADOW_MULTIPLIER = 1.5f;
 
-	RoundedButtonDelegate mDelegate;
+	static RoundedButtonImpl newInstance(View view, RoundedButtonOptions options) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			return new RoundedButtonImplLollipop(view, options);
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			return new RoundedButtonImplJellybeanMr1(view, options);
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			return new RoundedButtonImplJellybean(view, options);
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			return new RoundedButtonImplHoneycomb(view, options);
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
+			return new RoundedButtonImplEclairMr1(view, options);
+		} else {
+			throw new IllegalStateException("RoundedButton requires at API 7 or above");
+		}
+	}
+
 	View mView;
+	RoundedButtonDelegate mDelegate;
 	ColorStateList mColor;
 	Rect mContentPadding;
 	float mCornerRadius;
+	float mElevation;
 	Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
 	boolean mPreventCornerOverlap;
+	float mTranslationZ;
 	boolean mUseCompatAnimation;
 	boolean mUseCompatPadding;
 
-	BackgroundDrawableBase mBackgroundDrawable;
-	ShadowAnimationHelper mShadowAnimationHelper;
+	RoundedButtonDrawable mRoundedButtonDrawable;
 
-	public RoundedButtonImpl(RoundedButtonDelegate delegate, RoundedButtonOptions options) {
-		mDelegate = delegate;
+	public RoundedButtonImpl(View view, RoundedButtonOptions options) {
+		super();
+		mView = view;
 		try {
-			mView = (View) delegate;
+			mDelegate = (RoundedButtonDelegate) view;
 		} catch (ClassCastException e) {
-			throw new ClassCastException("delegate must be of type View");
+			throw new ClassCastException("view must implement RoundedButtonDelegate");
 		}
 		mColor = options.color;
 		mContentPadding = options.contentPadding;
 		mCornerRadius = options.cornerRadius;
+		mElevation = options.elevation;
 		mInsetPadding = options.insetPadding;
 		mMaxElevation = options.maxElevation;
 		mPressedTranslationZ = options.pressedTranslationZ;
 		mPreventCornerOverlap = options.preventCornerOverlap;
+		mTranslationZ = options.translationZ;
 		mUseCompatAnimation = options.useCompatAnimation;
 		mUseCompatPadding = options.useCompatPadding;
-		mBackgroundDrawable = createBackgroundDrawable();
-		Drawable drawable = (willWrapBackgroundDrawable()
-				? wrapBackgroundDrawable(mBackgroundDrawable) : mBackgroundDrawable);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			mView.setBackground(drawable);
-		} else {
-			mView.setBackgroundDrawable(drawable);
-		}
-		mShadowAnimationHelper = ShadowAnimationHelper.newInstance(mDelegate);
-		invalidatePadding();
+
+		mRoundedButtonDrawable = newRoundedButtonDrawable();
+		setSupportBackground(mRoundedButtonDrawable);
 	}
 
-	abstract BackgroundDrawableBase createBackgroundDrawable();
+	abstract RoundedButtonDrawable newRoundedButtonDrawable();
 
-	abstract boolean willWrapBackgroundDrawable();
+	abstract void setSupportBackground(Drawable background);
 
-	Drawable wrapBackgroundDrawable(BackgroundDrawableBase drawable) {
-		return drawable;
-	}
-
-	@Override
 	public ColorStateList getColor() {
 		return mColor;
 	}
 
-	@Override
 	public void setColor(ColorStateList color) {
 		mColor = color;
-		mBackgroundDrawable.invalidateSelf();
 	}
 
-	@Override
-	public int getContentPaddingLeft() {
-		return mContentPadding.left;
+	public Rect getContentPadding() {
+		return mContentPadding;
 	}
 
-	@Override
-	public int getContentPaddingTop() {
-		return mContentPadding.top;
+	public void setContentPadding(Rect contentPadding) {
+		mContentPadding = contentPadding;
 	}
 
-	@Override
-	public int getContentPaddingRight() {
-		return mContentPadding.right;
-	}
-
-	@Override
-	public int getContentPaddingBottom() {
-		return mContentPadding.bottom;
-	}
-
-	@Override
-	public void setContentPadding(int left, int top, int right, int bottom) {
-		if (left != mContentPadding.left || top != mContentPadding.top
-				|| right != mContentPadding.right || bottom != mContentPadding.bottom) {
-			mContentPadding.set(left, top, right, bottom);
-			invalidatePadding();
-		}
-	}
-
-	@Override
 	public float getCornerRadius() {
 		return mCornerRadius;
 	}
 
-	@Override
 	public void setCornerRadius(float cornerRadius) {
-		if (cornerRadius != mCornerRadius) {
-			mCornerRadius = cornerRadius;
-			mBackgroundDrawable.invalidateSelf();
-			if (mPreventCornerOverlap) {
-				invalidatePadding();
-			}
-		}
+		mCornerRadius = cornerRadius;
 	}
 
-	@Override
-	public int getInsetPaddingLeft() {
-		return mInsetPadding.left;
+	public float getElevation() {
+		return mElevation;
 	}
 
-	@Override
-	public int getInsetPaddingTop() {
-		return mInsetPadding.top;
+	public void setElevation(float elevation) {
+		mElevation = elevation;
 	}
 
-	@Override
-	public int getInsetPaddingRight() {
-		return mInsetPadding.right;
+	public Rect getInsetPadding() {
+		return mInsetPadding;
 	}
 
-	@Override
-	public int getInsetPaddingBottom() {
-		return mInsetPadding.bottom;
-	}
-
-	@Override
-	public void setInsetPadding(int left, int top, int right, int bottom) {
-		if (left != mInsetPadding.left || top != mInsetPadding.top
-				|| right != mInsetPadding.right || bottom != mInsetPadding.bottom) {
-			mInsetPadding.set(left, top, right, bottom);
-			mBackgroundDrawable.updateBounds(null);
-			mBackgroundDrawable.invalidateSelf();
+	public void setInsetPadding(Rect insetPadding) {
+		if (insetPadding.left != mInsetPadding.left || insetPadding.top != mInsetPadding.top
+				|| insetPadding.right != mInsetPadding.right
+				|| insetPadding.bottom != mInsetPadding.bottom) {
+			mInsetPadding.set(insetPadding);
+			mRoundedButtonDrawable.invalidateBounds();
 			invalidatePadding();
 		}
 	}
 
-	@Override
 	public float getMaxElevation() {
 		return mMaxElevation;
 	}
 
-	@Override
 	public void setMaxElevation(float maxElevation) {
-		if (maxElevation != mMaxElevation) {
-			mMaxElevation = maxElevation;
-			if (shouldUseCompatPadding()) {
-				mBackgroundDrawable.updateBounds(null);
-				mBackgroundDrawable.invalidateSelf();
-				invalidatePadding();
-			}
-		}
+		mMaxElevation = maxElevation;
 	}
 
-	@Override
+	public float getPressedTranslationZ() {
+		return mPressedTranslationZ;
+	}
+
+	public void setPressedTranslationZ(float pressedTranslationZ) {
+		mPressedTranslationZ = pressedTranslationZ;
+	}
+
 	public boolean isPreventCornerOverlap() {
-		return false;
+		return mPreventCornerOverlap;
 	}
 
-	@Override
 	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
-		if (preventCornerOverlap != mPreventCornerOverlap) {
-			mPreventCornerOverlap = preventCornerOverlap;
-			invalidatePadding();
-		}
+		mPreventCornerOverlap = preventCornerOverlap;
 	}
 
-	@Override
+	public float getTranslationZ() {
+		return mTranslationZ;
+	}
+
+	public void setTranslationZ(float translationZ) {
+		mTranslationZ = translationZ;
+	}
+
 	public boolean isUseCompatAnimation() {
 		return mUseCompatAnimation;
 	}
 
-	protected boolean shouldUseCompatAnimation() {
-		return mUseCompatAnimation;
-	}
-
-	@Override
 	public void setUseCompatAnimation(boolean useCompatAnimation) {
-		if (useCompatAnimation != mUseCompatAnimation) {
-			mUseCompatAnimation = useCompatAnimation;
-			onUseCompatAnimationChange(mUseCompatAnimation);
-		}
+		mUseCompatAnimation = useCompatAnimation;
 	}
 
-	protected void onUseCompatAnimationChange(boolean useCompatAnimation) {
-	}
-
-	@Override
 	public boolean isUseCompatPadding() {
 		return mUseCompatPadding;
 	}
 
-	protected boolean shouldUseCompatPadding() {
-		return mUseCompatPadding;
-	}
-
-	@Override
 	public void setUseCompatPadding(boolean useCompatPadding) {
-		if (useCompatPadding != mUseCompatPadding) {
-			mUseCompatPadding = useCompatPadding;
-			onUseCompatPaddingChange(mUseCompatPadding);
-		}
+		mUseCompatPadding = useCompatPadding;
 	}
 
-	protected void onUseCompatPaddingChange(boolean useCompatPadding) {
-	}
-
-	void invalidatePadding() {
-		int left = mInsetPadding.left;
-		int top = mInsetPadding.top;
-		int right = mInsetPadding.right;
-		int bottom = mInsetPadding.bottom;
-		if (shouldUseCompatPadding()) {
-			float verticalPadding = mMaxElevation * SHADOW_MULTIPLIER;
-			left += mMaxElevation;
-			top += verticalPadding;
-			right += mMaxElevation;
-			bottom += verticalPadding;
-		}
-		int overlay = (mPreventCornerOverlap ? (int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
-		mDelegate.onPaddingChanged(left, top, right, bottom, overlay);
-	}
-
-	public abstract class BackgroundDrawableBase extends Drawable {
-		final Paint mPaint;
+	abstract class RoundedButtonDrawable extends Drawable {
+		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
-		final Rect mBoundsI = new Rect();
 
-		public BackgroundDrawableBase() {
+		public RoundedButtonDrawable() {
 			super();
-			mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 		}
 
 		@Override
 		public void setAlpha(int alpha) {
-
+			mPaint.setAlpha(alpha);
 		}
 
 		@Override
 		public void setColorFilter(ColorFilter cf) {
-
+			mPaint.setColorFilter(cf);
 		}
 
 		@Override
@@ -272,7 +201,7 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 		@Override
 		protected void onBoundsChange(Rect bounds) {
 			super.onBoundsChange(bounds);
-			updateBounds(bounds);
+			invalidateBounds(bounds);
 		}
 
 		@Override
@@ -289,22 +218,51 @@ public abstract class RoundedButtonImpl implements RoundedButtonBase {
 
 		@Override
 		public void draw(Canvas canvas) {
-			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			canvas.drawRect(mBounds, mPaint);
 		}
 
-		public void updateBounds(Rect bounds) {
-			if (bounds == null) {
-				bounds = getBounds();
-			}
-			mBoundsI.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
+		void invalidateBounds(Rect bounds, boolean invalidate) {
+			mBounds.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
 					bounds.right - mInsetPadding.right, bounds.bottom - mInsetPadding.bottom);
-			mBoundsF.set(mBoundsI);
+			mBoundsF.set(mBounds);
 			if (mUseCompatPadding) {
-				int paddingHorizontal = (int) Math.ceil(mMaxElevation);
-				int paddingVertical = (int) Math.ceil(mMaxElevation * SHADOW_MULTIPLIER);
-				mBoundsI.inset(paddingHorizontal, paddingVertical);
-				mBoundsF.set(mBoundsI);
+				mBounds.inset(Math.round(mMaxElevation),
+						Math.round(mMaxElevation * SHADOW_MULTIPLIER));
+				mBoundsF.set(mBounds);
+			}
+			if (invalidate) {
+				invalidateSelf();
 			}
 		}
+
+		void invalidateBounds(Rect bounds) {
+			invalidateBounds(bounds, false);
+		}
+
+		void invalidateBounds() {
+			invalidateBounds(getBounds(), true);
+		}
+	}
+
+	void invalidatePadding() {
+
+	}
+
+	static class RoundedButtonOptions {
+		ColorStateList color = null;
+		final Rect contentPadding = new Rect();
+		float cornerRadius = 0f;
+		float elevation = 0f;
+		final Rect insetPadding = new Rect();
+		float maxElevation = 0f;
+		float pressedTranslationZ = 0f;
+		boolean preventCornerOverlap = false;
+		float translationZ = 0f;
+		boolean useCompatAnimation = false;
+		boolean useCompatPadding = false;
+	}
+
+	interface RoundedButtonDelegate {
+		void onPaddingChanged(int left, int top, int right, int bottom);
 	}
 }
