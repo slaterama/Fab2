@@ -7,20 +7,12 @@ import android.view.View;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class RoundedButtonImplJellybean extends RoundedButtonImplHoneycomb {
-	public RoundedButtonImplJellybean(View view, RoundedButtonOptions options) {
-		super(view, options);
-	}
-
-	@Override
-	RoundedButtonDrawable newRoundedButtonDrawable() {
-		return new RoundedButtonDrawableJellybean();
+	public RoundedButtonImplJellybean(View view, RoundedButtonAttributes attributes) {
+		super(view, attributes);
 	}
 
 	@Override
 	void setSupportBackground(Drawable background) {
 		mView.setBackground(background);
-	}
-
-	class RoundedButtonDrawableJellybean extends RoundedButtonDrawableHoneycomb {
 	}
 }

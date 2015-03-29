@@ -56,8 +56,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 	final RectF mCornerRect = new RectF();
 
-	public RoundedButtonImplEclairMr1(View view, RoundedButtonOptions options) {
-		super(view, options);
+	public RoundedButtonImplEclairMr1(View view, RoundedButtonAttributes attributes) {
+		super(view, attributes);
 		mRoundedButtonDrawableEclairMr1 = (RoundedButtonDrawableEclairMr1) mRoundedButtonDrawable;
 	}
 

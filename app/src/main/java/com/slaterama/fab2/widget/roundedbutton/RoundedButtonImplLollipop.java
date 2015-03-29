@@ -10,12 +10,15 @@ import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
 
+// TODO NEXT Problem with setting useCompatPadding = true.
+// I think it's the order of setting bounds/setting padding/measuring etc.
+
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class RoundedButtonImplLollipop extends RoundedButtonImpl {
-	public RoundedButtonImplLollipop(View view, RoundedButtonOptions options) {
-		super(view, options);
-		mView.setElevation(options.elevation);
-		mView.setTranslationZ(options.translationZ);
+	public RoundedButtonImplLollipop(View view, RoundedButtonAttributes attributes) {
+		super(view, attributes);
+		mView.setElevation(attributes.elevation);
+		mView.setTranslationZ(attributes.translationZ);
 		mView.setClipToOutline(true);
 	}
 
@@ -64,6 +67,7 @@ public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 		super.setUseCompatPadding(useCompatPadding);
 		if (mUseCompatPadding != oldValue) {
 			mRoundedButtonDrawable.invalidateBounds();
+			invalidatePadding();
 		}
 	}
 
