@@ -1,13 +1,12 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
 import android.annotation.TargetApi;
-import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class RoundedButtonImplHoneycomb extends RoundedButtonImpl {
+public class RoundedButtonImplHoneycomb extends RoundedButtonImplEclairMr1 {
 	public RoundedButtonImplHoneycomb(View view, RoundedButtonOptions options) {
 		super(view, options);
 	}
@@ -22,10 +21,6 @@ public class RoundedButtonImplHoneycomb extends RoundedButtonImpl {
 		mView.setBackgroundDrawable(background);
 	}
 
-	class RoundedButtonDrawableHoneycomb extends RoundedButtonDrawable {
-		@Override
-		public void draw(Canvas canvas) {
-// TODO			canvas.drawRoundRect(bounds, rx, ry, paint);
-		}
+	class RoundedButtonDrawableHoneycomb extends RoundedButtonDrawableEclairMr1 {
 	}
 }

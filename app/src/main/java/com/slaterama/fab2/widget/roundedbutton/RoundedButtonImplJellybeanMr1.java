@@ -2,12 +2,13 @@ package com.slaterama.fab2.widget.roundedbutton;
 
 import android.annotation.TargetApi;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 import android.view.View;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-public class RoundedButtonImplJellybeanMr1 extends RoundedButtonImpl {
+public class RoundedButtonImplJellybeanMr1 extends RoundedButtonImplJellybean {
 	public RoundedButtonImplJellybeanMr1(View view, RoundedButtonOptions options) {
 		super(view, options);
 	}
@@ -17,15 +18,10 @@ public class RoundedButtonImplJellybeanMr1 extends RoundedButtonImpl {
 		return new RoundedButtonDrawableJellybeanMr1();
 	}
 
-	@Override
-	void setSupportBackground(Drawable background) {
-		mView.setBackground(background);
-	}
-
-	class RoundedButtonDrawableJellybeanMr1 extends RoundedButtonDrawable {
+	class RoundedButtonDrawableJellybeanMr1 extends RoundedButtonDrawableJellybean {
 		@Override
-		public void draw(Canvas canvas) {
-// TODO			canvas.drawRoundRect(bounds, rx, ry, paint);
+		protected void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint) {
+			canvas.drawRoundRect(rect, rx, ry, paint);
 		}
 	}
 }

@@ -4,20 +4,29 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.Button;
 
 import com.slaterama.fab2.R;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonOptions;
+import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.getResolvedSize;
 
 public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
 
 	RoundedButtonImpl mImpl;
+
+	float mCornerRadius;
+
+	final Rect mDrawablePadding = new Rect();
+
+	final Point mResolvedSize = new Point();
 
 	public RoundedButton(Context context) {
 		this(context, null);
@@ -41,6 +50,7 @@ public class RoundedButton extends Button
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		RoundedButtonOptions options = newOptions(context, attrs, defStyleAttr, defStyleRes);
 		mImpl = RoundedButtonImpl.newInstance(this, options);
+		mCornerRadius = options.cornerRadius;
 	}
 
 	RoundedButtonOptions newOptions(Context context, AttributeSet attrs, int defStyleAttr,
@@ -89,6 +99,16 @@ public class RoundedButton extends Button
 		return options;
 	}
 
+	@Override
+	public void setPadding(int left, int top, int right, int bottom) {
+		// NO OP
+	}
+
+	@Override
+	public void setPaddingRelative(int start, int top, int end, int bottom) {
+		// NO OP
+	}
+
 	public ColorStateList getColor() {
 		return mImpl.getColor();
 	}
@@ -127,6 +147,7 @@ public class RoundedButton extends Button
 
 	public void setCornerRadius(float cornerRadius) {
 		mImpl.setCornerRadius(cornerRadius);
+		mCornerRadius = cornerRadius;
 	}
 
 	public float getSupportElevation() {
@@ -206,7 +227,20 @@ public class RoundedButton extends Button
 	}
 
 	@Override
-	public void onPaddingChanged(int left, int top, int right, int bottom) {
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		getResolvedSize(this, mCornerRadius, mDrawablePadding,
+				widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
+		Log.d("RoundedButton", String.format("measuredWidth=%d, measuredHeight=%d, mResolvedSize=(%d, %d)",
+				getMeasuredWidth(), getMeasuredHeight(), mResolvedSize.x, mResolvedSize.y));
+		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
+	}
 
+	@Override
+	public void onPaddingChanged(int left, int top, int right, int bottom) {
+		// TODO Get rid of drawable padding. Just have getResolvedSize take four separate ints
+		mDrawablePadding.set(left, top, right, bottom);
+		super.setPadding(left, top, right, bottom);
+		requestLayout();
 	}
 }

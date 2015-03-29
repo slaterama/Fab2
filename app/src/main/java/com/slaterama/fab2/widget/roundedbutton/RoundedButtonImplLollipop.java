@@ -50,6 +50,15 @@ public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 	}
 
 	@Override
+	public void setUseCompatAnimation(boolean useCompatAnimation) {
+		boolean oldValue = mUseCompatAnimation;
+		super.setUseCompatAnimation(useCompatAnimation);
+		if (mUseCompatAnimation != oldValue) {
+			// TODO Save or restore old state list
+		}
+	}
+
+	@Override
 	public void setUseCompatPadding(boolean useCompatPadding) {
 		boolean oldValue = mUseCompatPadding;
 		super.setUseCompatPadding(useCompatPadding);
