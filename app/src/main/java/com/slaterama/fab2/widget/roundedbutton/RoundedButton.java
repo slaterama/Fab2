@@ -145,7 +145,8 @@ public class RoundedButton extends Button
 	}
 
 	public void setContentPadding(Rect contentPadding) {
-		if (contentPadding.left != mContentPadding.left || contentPadding.top != mContentPadding.top
+		if (contentPadding.left != mContentPadding.left
+				|| contentPadding.top != mContentPadding.top
 				|| contentPadding.right != mContentPadding.right
 				|| contentPadding.bottom != mContentPadding.bottom) {
 			mContentPadding.set(contentPadding);
@@ -249,8 +250,8 @@ public class RoundedButton extends Button
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		getResolvedSize(this, mCornerRadius, mDrawablePadding,
-				widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
+		getResolvedSize(this, widthMeasureSpec, heightMeasureSpec, mCornerRadius, mDrawablePadding,
+				true, mResolvedSize);
 		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
 	}
 

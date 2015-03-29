@@ -39,8 +39,8 @@ public abstract class RoundedButtonImpl {
 		return (preventCornerOverlap ? (int) Math.ceil((1 - COS_45) * cornerRadius) : 0);
 	}
 
-	static void getResolvedSize(View view, float cornerRadius, Rect drawablePadding,
-	                            int widthMeasureSpec, int heightMeasureSpec,
+	static void getResolvedSize(View view, int widthMeasureSpec, int heightMeasureSpec,
+	                            float cornerRadius, Rect drawablePadding,
 	                            boolean useMeasuredSize, Point resolvedSize) {
 		final int diameter = (int) (2 * cornerRadius);
 		final int minWidth = diameter + drawablePadding.left + drawablePadding.right;
