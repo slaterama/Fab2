@@ -11,7 +11,6 @@ import android.util.TypedValue;
 import android.view.View;
 
 // TODO NEXT Problem with setting useCompatPadding = true.
-// I think it's the order of setting bounds/setting padding/measuring etc.
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class RoundedButtonImplLollipop extends RoundedButtonImpl {
@@ -87,7 +86,6 @@ public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 
 		@Override
 		public void draw(Canvas canvas) {
-			super.draw(canvas);
 			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 	}

@@ -17,6 +17,7 @@ import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedB
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.calculateOverlayPadding;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.getResolvedSize;
 
+@SuppressWarnings("unused")
 public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
 

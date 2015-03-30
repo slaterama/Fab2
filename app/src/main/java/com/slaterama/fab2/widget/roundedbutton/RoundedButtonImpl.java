@@ -138,7 +138,13 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setMaxElevation(float maxElevation) {
-		mMaxElevation = maxElevation;
+		if (maxElevation != mMaxElevation) {
+			mMaxElevation = maxElevation;
+			if (willUseCompatPadding()) {
+				mRoundedButtonDrawable.invalidateBounds();
+				invalidatePadding();
+			}
+		}
 	}
 
 	public float getPressedTranslationZ() {
@@ -234,10 +240,13 @@ public abstract class RoundedButtonImpl {
 		}
 
 		void invalidateBounds(Rect bounds, boolean invalidate) {
-			mBounds.set(bounds.left + mInsetPadding.left, bounds.top + mInsetPadding.top,
-					bounds.right - mInsetPadding.right, bounds.bottom - mInsetPadding.bottom);
+			mBounds.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
+//			mBounds.left += mInsetPadding.left;
+//			mBounds.top += mInsetPadding.top;
+//			mBounds.right -= mInsetPadding.right;
+//			mBounds.bottom -= mInsetPadding.bottom;
 			mBoundsF.set(mBounds);
-			if (mUseCompatPadding) {
+			if (willUseCompatPadding()) {
 				mBounds.inset(Math.round(mMaxElevation),
 						Math.round(mMaxElevation * SHADOW_MULTIPLIER));
 				mBoundsF.set(mBounds);
@@ -262,8 +271,8 @@ public abstract class RoundedButtonImpl {
 		int right = mInsetPadding.right;
 		int bottom = mInsetPadding.bottom;
 		if (willUseCompatPadding()) {
-			int horizontalPadding = (int) mMaxElevation;
-			int verticalPadding = (int) (mMaxElevation * SHADOW_MULTIPLIER);
+			int horizontalPadding = Math.round(mMaxElevation);
+			int verticalPadding = Math.round(mMaxElevation * SHADOW_MULTIPLIER);
 			left += horizontalPadding;
 			top += verticalPadding;
 			right += horizontalPadding;
