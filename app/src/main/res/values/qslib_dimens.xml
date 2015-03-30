@@ -8,24 +8,20 @@
 	<dimen name="qslib_rounded_btn_content_padding_vertical">4dp</dimen>
 	<dimen name="qslib_rounded_btn_content_padding_horizontal">8dp</dimen>
 	<dimen name="qslib_rounded_btn_corner_radius">2dp</dimen>
-	<dimen name="qslib_rounded_btn_disabled_elevation">0dp</dimen>
 	<dimen name="qslib_rounded_btn_elevation">2dp</dimen>
 	<dimen name="qslib_rounded_btn_inset_padding_vertical">6dp</dimen>
 	<dimen name="qslib_rounded_btn_inset_padding_horizontal">4dp</dimen>
 	<dimen name="qslib_rounded_btn_max_elevation">6dp</dimen>
 	<dimen name="qslib_rounded_btn_pressed_translation_z">4dp</dimen>
-	<dimen name="qslib_rounded_btn_translation_z">0dp</dimen>
 
 	<dimen name="qslib_fab_content_padding_vertical">0dp</dimen>
 	<dimen name="qslib_fab_content_padding_horizontal">0dp</dimen>
 	<dimen name="qslib_fab_corner_radius">28dp</dimen>
 	<dimen name="qslib_fab_corner_radius_small">20dp</dimen>
-	<dimen name="qslib_fab_disabled_elevation">0dp</dimen>
 	<dimen name="qslib_fab_elevation">4dp</dimen>
 	<dimen name="qslib_fab_inset_padding_vertical">0dp</dimen>
 	<dimen name="qslib_fab_inset_padding_horizontal">0dp</dimen>
 	<dimen name="qslib_fab_max_elevation">8dp</dimen>
 	<dimen name="qslib_fab_pressed_translation_z">4dp</dimen>
-	<dimen name="qslib_fab_translation_z">0dp</dimen>
 
 </resources>
