@@ -8,6 +8,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
 import android.widget.Button;
 
 import com.slaterama.fab2.R;
@@ -59,6 +61,8 @@ public class RoundedButton extends Button
 		mCornerRadius = attributes.cornerRadius;
 		mPreventCornerOverlap = attributes.preventCornerOverlap;
 		mImpl.invalidatePadding();
+		float density = context.getResources().getDisplayMetrics().density;
+		Log.d("RoundedButton", String.format("density=%f", density));
 	}
 
 	RoundedButtonAttributes newOptions(Context context, AttributeSet attrs, int defStyleAttr,
@@ -160,6 +164,9 @@ public class RoundedButton extends Button
 	}
 
 	public void setCornerRadius(float cornerRadius) {
+
+		// TODO add preventcorneroverlap to impl and have impl call invalidatepadding if appropriate
+
 		mImpl.setCornerRadius(cornerRadius);
 		if (cornerRadius != mCornerRadius) {
 			mCornerRadius = cornerRadius;
@@ -257,14 +264,21 @@ public class RoundedButton extends Button
 	}
 
 	@Override
-	public void onPaddingChanged(int left, int top, int right, int bottom) {
-		mDrawablePadding.set(left, top, right, bottom);
+	public void onPaddingChanged(Rect insetPadding, Point shadowPadding) {
+		// TODO Clean? (Plus move mPreventCornerOverlap into impl and calculate overlay padding there
+		mDrawablePadding.set(
+				insetPadding.left + shadowPadding.x,
+				insetPadding.top + shadowPadding.y,
+				insetPadding.right + shadowPadding.x,
+				insetPadding.bottom + shadowPadding.y);
 		int overlayPadding = calculateOverlayPadding(mPreventCornerOverlap, mCornerRadius);
 		super.setPadding(
-				left + overlayPadding + mContentPadding.left,
-				top + overlayPadding + mContentPadding.top,
-				right + overlayPadding + mContentPadding.right,
-				bottom + overlayPadding + mContentPadding.bottom);
+				mDrawablePadding.left + overlayPadding + mContentPadding.left,
+				mDrawablePadding.top + overlayPadding + mContentPadding.top,
+				mDrawablePadding.right + overlayPadding + mContentPadding.right,
+				mDrawablePadding.bottom + overlayPadding + mContentPadding.bottom);
+		setMinWidth(getSuggestedMinimumWidth() + 2 * shadowPadding.x);
+		setMinHeight(getSuggestedMinimumHeight() + 2 * shadowPadding.y);
 		requestLayout();
 	}
 }

@@ -66,6 +66,7 @@ public abstract class RoundedButtonImpl {
 	boolean mUseCompatPadding;
 
 	RoundedButtonDrawable mRoundedButtonDrawable;
+	final Point mShadowPadding = new Point();
 
 	public RoundedButtonImpl(View view, RoundedButtonAttributes attributes) {
 		super();
@@ -87,8 +88,6 @@ public abstract class RoundedButtonImpl {
 
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
 		setSupportBackground(mRoundedButtonDrawable);
-
-		mRoundedButtonDrawable.invalidateBounds();
 	}
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
@@ -240,11 +239,11 @@ public abstract class RoundedButtonImpl {
 		}
 
 		void invalidateBounds(Rect bounds, boolean invalidate) {
-			mBounds.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
-//			mBounds.left += mInsetPadding.left;
-//			mBounds.top += mInsetPadding.top;
-//			mBounds.right -= mInsetPadding.right;
-//			mBounds.bottom -= mInsetPadding.bottom;
+			mBounds.set(bounds);
+			mBounds.left += mInsetPadding.left;
+			mBounds.top += mInsetPadding.top;
+			mBounds.right -= mInsetPadding.right;
+			mBounds.bottom -= mInsetPadding.bottom;
 			mBoundsF.set(mBounds);
 			if (willUseCompatPadding()) {
 				mBounds.inset(Math.round(mMaxElevation),
@@ -266,19 +265,13 @@ public abstract class RoundedButtonImpl {
 	}
 
 	void invalidatePadding() {
-		int left = mInsetPadding.left;
-		int top = mInsetPadding.top;
-		int right = mInsetPadding.right;
-		int bottom = mInsetPadding.bottom;
 		if (willUseCompatPadding()) {
-			int horizontalPadding = Math.round(mMaxElevation);
-			int verticalPadding = Math.round(mMaxElevation * SHADOW_MULTIPLIER);
-			left += horizontalPadding;
-			top += verticalPadding;
-			right += horizontalPadding;
-			bottom += verticalPadding;
+			mShadowPadding.set(Math.round(mMaxElevation),
+					Math.round(mMaxElevation * SHADOW_MULTIPLIER));
+		} else {
+			mShadowPadding.set(0, 0);
 		}
-		mDelegate.onPaddingChanged(left, top, right, bottom);
+		mDelegate.onPaddingChanged(mInsetPadding, mShadowPadding);
 	}
 
 	static class RoundedButtonAttributes {
@@ -296,6 +289,6 @@ public abstract class RoundedButtonImpl {
 	}
 
 	interface RoundedButtonDelegate {
-		void onPaddingChanged(int left, int top, int right, int bottom);
+		void onPaddingChanged(Rect insetPadding, Point shadowPadding);
 	}
 }

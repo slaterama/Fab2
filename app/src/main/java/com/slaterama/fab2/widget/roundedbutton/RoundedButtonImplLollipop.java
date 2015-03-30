@@ -10,8 +10,6 @@ import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
 
-// TODO NEXT Problem with setting useCompatPadding = true.
-
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 	public RoundedButtonImplLollipop(View view, RoundedButtonAttributes attributes) {
