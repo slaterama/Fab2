@@ -1,5 +1,6 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
+import android.animation.StateListAnimator;
 import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
@@ -11,12 +12,30 @@ import android.util.TypedValue;
 import android.view.View;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class RoundedButtonImplLollipop extends RoundedButtonImpl {
+public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
+
+	static StateListAnimator generateStateListAnimator(View view, float elevation,
+	                                                   float pressedTranslationZ) {
+		StateListAnimator stateListAnimator = new StateListAnimator();
+		for (int[] specs : SPECS_ARRAY) {
+			stateListAnimator.addState(specs, createAnimatorForState(
+					specs, view, elevation, pressedTranslationZ));
+		}
+		return stateListAnimator;
+	}
+
+	StateListAnimator mSavedStateListAnimator;
+
 	public RoundedButtonImplLollipop(View view, RoundedButtonAttributes attributes) {
 		super(view, attributes);
-		mView.setElevation(attributes.elevation);
-		mView.setTranslationZ(attributes.translationZ);
-		mView.setClipToOutline(true);
+		view.setElevation(attributes.elevation);
+		view.setTranslationZ(attributes.translationZ);
+		if (mUseCompatAnimation) {
+			mSavedStateListAnimator = view.getStateListAnimator();
+			view.setStateListAnimator(generateStateListAnimator(mView, mElevation,
+					mPressedTranslationZ));
+		}
+		view.setClipToOutline(true);
 	}
 
 	@Override
@@ -30,42 +49,41 @@ public class RoundedButtonImplLollipop extends RoundedButtonImpl {
 	}
 
 	@Override
-	public float getElevation() {
-		return mView.getElevation();
-	}
-
-	@Override
-	public void setElevation(float elevation) {
+	void onElevationChanged(float elevation) {
 		mView.setElevation(elevation);
 	}
 
 	@Override
-	public float getTranslationZ() {
-		return mView.getTranslationZ();
-	}
-
-	@Override
-	public void setTranslationZ(float translationZ) {
+	void onTranslationZChanged(float translationZ) {
 		mView.setTranslationZ(translationZ);
 	}
 
 	@Override
-	public void setUseCompatAnimation(boolean useCompatAnimation) {
-		boolean oldValue = mUseCompatAnimation;
-		super.setUseCompatAnimation(useCompatAnimation);
-		if (mUseCompatAnimation != oldValue) {
-			// TODO Save or restore old state list
+	protected boolean willUseCompatAnimation() {
+		return mUseCompatAnimation;
+	}
+
+	@Override
+	protected boolean willUseCompatPadding() {
+		return mUseCompatPadding;
+	}
+
+	@Override
+	void onUseCompatAnimationChanged(boolean useCompatAnimation) {
+		if (useCompatAnimation) {
+			mSavedStateListAnimator = mView.getStateListAnimator();
+			mView.setStateListAnimator(generateStateListAnimator(mView, mElevation,
+					mPressedTranslationZ));
+		} else {
+			mView.setStateListAnimator(mSavedStateListAnimator);
+			mSavedStateListAnimator = null;
 		}
 	}
 
 	@Override
-	public void setUseCompatPadding(boolean useCompatPadding) {
-		boolean oldValue = mUseCompatPadding;
-		super.setUseCompatPadding(useCompatPadding);
-		if (mUseCompatPadding != oldValue) {
-			mRoundedButtonDrawable.invalidateBounds();
-			invalidatePadding();
-		}
+	void onUseCompatPaddingChanged(boolean useCompatPadding) {
+		mRoundedButtonDrawable.invalidateBounds();
+		invalidatePadding();
 	}
 
 	protected Drawable wrapBackgroundDrawable(Drawable background) {

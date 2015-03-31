@@ -10,12 +10,21 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.StateSet;
 import android.view.View;
 
 @SuppressWarnings("unused")
 public abstract class RoundedButtonImpl {
 
 	static final float SHADOW_MULTIPLIER = 1.5f;
+
+	static int[] PRESSED_SPECS = new int[]{android.R.attr.state_pressed,
+			android.R.attr.state_enabled};
+	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
+	static int[][] SPECS_ARRAY = new int[][]{PRESSED_SPECS, BASE_SPECS, StateSet.WILD_CARD};
+
+	static String ELEVATION_PROPERTY = "elevation";
+	static String TRANSLATION_Z_PROPERTY = "translationZ";
 
 	// used to calculate overlap padding
 	static final double COS_45 = Math.cos(Math.toRadians(45));
@@ -124,7 +133,10 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setElevation(float elevation) {
-		mElevation = elevation;
+		if (elevation != mElevation) {
+			mElevation = elevation;
+			onElevationChanged(elevation);
+		}
 	}
 
 	public Rect getInsetPadding() {
@@ -179,31 +191,52 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setTranslationZ(float translationZ) {
-		mTranslationZ = translationZ;
+		if (translationZ != mTranslationZ) {
+			mTranslationZ = translationZ;
+			onTranslationZChanged(translationZ);
+		}
 	}
 
 	public boolean isUseCompatAnimation() {
 		return mUseCompatAnimation;
 	}
 
-	protected boolean willUseCompatAnimation() {
-		return mUseCompatAnimation;
-	}
-
 	public void setUseCompatAnimation(boolean useCompatAnimation) {
-		mUseCompatAnimation = useCompatAnimation;
+		if (useCompatAnimation != mUseCompatAnimation) {
+			mUseCompatAnimation = useCompatAnimation;
+			onUseCompatAnimationChanged(useCompatAnimation);
+		}
 	}
 
 	public boolean isUseCompatPadding() {
 		return mUseCompatPadding;
 	}
 
+	public void setUseCompatPadding(boolean useCompatPadding) {
+		if (useCompatPadding != mUseCompatPadding) {
+			mUseCompatPadding = useCompatPadding;
+			onUseCompatPaddingChanged(useCompatPadding);
+		}
+	}
+
+	protected boolean willUseCompatAnimation() {
+		return mUseCompatAnimation;
+	}
+
 	protected boolean willUseCompatPadding() {
 		return mUseCompatPadding;
 	}
 
-	public void setUseCompatPadding(boolean useCompatPadding) {
-		mUseCompatPadding = useCompatPadding;
+	void onElevationChanged(float elevation) {
+	}
+
+	void onTranslationZChanged(float translationZ) {
+	}
+
+	void onUseCompatAnimationChanged(boolean useCompatAnimation) {
+	}
+
+	void onUseCompatPaddingChanged(boolean useCompatPadding) {
 	}
 
 	void resolveSize(int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,

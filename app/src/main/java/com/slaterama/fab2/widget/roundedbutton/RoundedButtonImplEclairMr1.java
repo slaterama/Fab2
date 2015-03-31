@@ -52,41 +52,23 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 	}
 
-	final RoundedButtonDrawableEclairMr1 mRoundedButtonDrawableEclairMr1;
+	RoundedButtonDrawableEclairMr1 mRoundedButtonDrawableEclairMr1;
 
 	final RectF mCornerRect = new RectF();
 
 	public RoundedButtonImplEclairMr1(View view, RoundedButtonAttributes attributes) {
 		super(view, attributes);
-		mRoundedButtonDrawableEclairMr1 = (RoundedButtonDrawableEclairMr1) mRoundedButtonDrawable;
 	}
 
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
-		return new RoundedButtonDrawableEclairMr1();
+		mRoundedButtonDrawableEclairMr1 = new RoundedButtonDrawableEclairMr1();
+		return mRoundedButtonDrawableEclairMr1;
 	}
 
 	@Override
 	void setSupportBackground(Drawable background) {
 		mView.setBackgroundDrawable(background);
-	}
-
-	@Override
-	public void setElevation(float elevation) {
-		float oldValue = mElevation;
-		super.setElevation(elevation);
-		if (mElevation != oldValue) {
-			mRoundedButtonDrawableEclairMr1.invalidateShadow();
-		}
-	}
-
-	@Override
-	public void setTranslationZ(float translationZ) {
-		float oldValue = mTranslationZ;
-		super.setElevation(translationZ);
-		if (mTranslationZ != oldValue) {
-			mRoundedButtonDrawableEclairMr1.invalidateShadow();
-		}
 	}
 
 	@Override
@@ -97,6 +79,16 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	@Override
 	protected boolean willUseCompatPadding() {
 		return true;
+	}
+
+	@Override
+	void onElevationChanged(float elevation) {
+		mRoundedButtonDrawableEclairMr1.invalidateShadow();
+	}
+
+	@Override
+	void onTranslationZChanged(float translationZ) {
+		mRoundedButtonDrawableEclairMr1.invalidateShadow();
 	}
 
 	class RoundedButtonDrawableEclairMr1 extends RoundedButtonDrawable {

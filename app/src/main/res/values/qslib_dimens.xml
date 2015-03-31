@@ -8,11 +8,11 @@
 	<dimen name="qslib_rounded_btn_content_padding_vertical">4dp</dimen>
 	<dimen name="qslib_rounded_btn_content_padding_horizontal">8dp</dimen>
 	<dimen name="qslib_rounded_btn_corner_radius">2dp</dimen>
-	<dimen name="qslib_rounded_btn_elevation">2dp</dimen>
+	<dimen name="qslib_rounded_btn_elevation">1dp</dimen>
 	<dimen name="qslib_rounded_btn_inset_padding_vertical">6dp</dimen>
 	<dimen name="qslib_rounded_btn_inset_padding_horizontal">4dp</dimen>
 	<dimen name="qslib_rounded_btn_max_elevation">6dp</dimen>
-	<dimen name="qslib_rounded_btn_pressed_translation_z">4dp</dimen>
+	<dimen name="qslib_rounded_btn_pressed_translation_z">2dp</dimen>
 
 	<dimen name="qslib_fab_content_padding_vertical">0dp</dimen>
 	<dimen name="qslib_fab_content_padding_horizontal">0dp</dimen>
