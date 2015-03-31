@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
+@SuppressWarnings("unused")
 public abstract class RoundedButtonImpl {
 
 	static final float SHADOW_MULTIPLIER = 1.5f;
@@ -35,32 +36,17 @@ public abstract class RoundedButtonImpl {
 		}
 	}
 
-	static int calculateOverlayPadding(boolean preventCornerOverlap, float cornerRadius) {
-		return (preventCornerOverlap ? (int) Math.ceil((1 - COS_45) * cornerRadius) : 0);
-	}
-
-	static void getResolvedSize(View view, int widthMeasureSpec, int heightMeasureSpec,
-	                            float cornerRadius, Rect drawablePadding,
-	                            boolean useMeasuredSize, Point resolvedSize) {
-		final int diameter = (int) (2 * cornerRadius);
-		final int minWidth = diameter + drawablePadding.left + drawablePadding.right;
-		final int minHeight = diameter + drawablePadding.top + drawablePadding.bottom;
-		int requestedWidth = (useMeasuredSize
-				? Math.max(minWidth, view.getMeasuredWidth()) : minWidth);
-		int requestedHeight = (useMeasuredSize
-				? Math.max(minHeight, view.getMeasuredHeight()) : minHeight);
-		resolvedSize.set(View.resolveSize(requestedWidth, widthMeasureSpec),
-				View.resolveSize(requestedHeight, heightMeasureSpec));
-	}
-
 	View mView;
 	RoundedButtonDelegate mDelegate;
 	ColorStateList mColor;
+	final Rect mContentPadding;
 	float mCornerRadius;
+	int mDiameter;
 	float mElevation;
-	Rect mInsetPadding;
+	final Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
+	boolean mPreventCornerOverlap;
 	float mTranslationZ;
 	boolean mUseCompatAnimation;
 	boolean mUseCompatPadding;
@@ -77,17 +63,21 @@ public abstract class RoundedButtonImpl {
 			throw new ClassCastException("view must implement RoundedButtonDelegate");
 		}
 		mColor = attributes.color;
+		mContentPadding = new Rect(attributes.contentPadding);
 		mCornerRadius = attributes.cornerRadius;
+		mDiameter = Math.round(attributes.cornerRadius + 2);
 		mElevation = attributes.elevation;
-		mInsetPadding = attributes.insetPadding;
+		mInsetPadding = new Rect(attributes.insetPadding);
 		mMaxElevation = attributes.maxElevation;
 		mPressedTranslationZ = attributes.pressedTranslationZ;
+		mPreventCornerOverlap = attributes.preventCornerOverlap;
 		mTranslationZ = attributes.translationZ;
 		mUseCompatAnimation = attributes.useCompatAnimation;
 		mUseCompatPadding = attributes.useCompatPadding;
 
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
 		setSupportBackground(mRoundedButtonDrawable);
+		invalidatePadding();
 	}
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
@@ -106,8 +96,27 @@ public abstract class RoundedButtonImpl {
 		return mCornerRadius;
 	}
 
+	public Rect getContentPadding() {
+		return mContentPadding;
+	}
+
+	public void setContentPadding(Rect contentPadding) {
+		if (contentPadding.left != mContentPadding.left || contentPadding.top != mContentPadding.top
+				|| contentPadding.right != mContentPadding.right
+				|| contentPadding.bottom != mContentPadding.bottom) {
+			mContentPadding.set(contentPadding);
+			invalidatePadding();
+		}
+	}
+
 	public void setCornerRadius(float cornerRadius) {
-		mCornerRadius = cornerRadius;
+		if (cornerRadius != mCornerRadius) {
+			mCornerRadius = cornerRadius;
+			mDiameter = Math.round(cornerRadius * 2);
+			if (mPreventCornerOverlap) {
+				invalidatePadding();
+			}
+		}
 	}
 
 	public float getElevation() {
@@ -154,6 +163,17 @@ public abstract class RoundedButtonImpl {
 		mPressedTranslationZ = pressedTranslationZ;
 	}
 
+	public boolean isPreventCornerOverlap() {
+		return mPreventCornerOverlap;
+	}
+
+	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
+		if (preventCornerOverlap != mPreventCornerOverlap) {
+			mPreventCornerOverlap = preventCornerOverlap;
+			invalidatePadding();
+		}
+	}
+
 	public float getTranslationZ() {
 		return mTranslationZ;
 	}
@@ -184,6 +204,20 @@ public abstract class RoundedButtonImpl {
 
 	public void setUseCompatPadding(boolean useCompatPadding) {
 		mUseCompatPadding = useCompatPadding;
+	}
+
+	void resolveSize(int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
+	                 Point resolvedSize) {
+		final int minWidth = mDiameter + mInsetPadding.left + mInsetPadding.right
+				+ mShadowPadding.x * 2;
+		final int minHeight = mDiameter + mInsetPadding.top + mInsetPadding.bottom
+				+ mShadowPadding.y * 2;
+		int requestedWidth = (useMeasuredSize
+				? Math.max(minWidth, mView.getMeasuredWidth()) : minWidth);
+		int requestedHeight = (useMeasuredSize
+				? Math.max(minHeight, mView.getMeasuredHeight()) : minHeight);
+		resolvedSize.set(View.resolveSize(requestedWidth, widthMeasureSpec),
+				View.resolveSize(requestedHeight, heightMeasureSpec));
 	}
 
 	abstract class RoundedButtonDrawable extends Drawable {
@@ -265,13 +299,31 @@ public abstract class RoundedButtonImpl {
 	}
 
 	void invalidatePadding() {
+		final int cornerOverlapPadding = (mPreventCornerOverlap ?
+				(int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
+		final int horizontalShadowPadding;
+		final int verticalShadowPadding;
 		if (willUseCompatPadding()) {
 			mShadowPadding.set(Math.round(mMaxElevation),
 					Math.round(mMaxElevation * SHADOW_MULTIPLIER));
+			horizontalShadowPadding = mShadowPadding.x * 2;
+			verticalShadowPadding = mShadowPadding.y * 2;
 		} else {
 			mShadowPadding.set(0, 0);
+			horizontalShadowPadding = 0;
+			verticalShadowPadding = 0;
 		}
-		mDelegate.onPaddingChanged(mInsetPadding, mShadowPadding);
+		int left = mInsetPadding.left + mShadowPadding.x + cornerOverlapPadding
+				+ mContentPadding.left;
+		int top = mInsetPadding.top + mShadowPadding.y + cornerOverlapPadding
+				+ mContentPadding.top;
+		int right = mInsetPadding.right + mShadowPadding.x + cornerOverlapPadding
+				+ mContentPadding.right;
+		int bottom = mInsetPadding.bottom + mShadowPadding.y + cornerOverlapPadding
+				+ mContentPadding.bottom;
+		mDelegate.onPaddingChanged(left, top, right, bottom, horizontalShadowPadding,
+				verticalShadowPadding);
+		mView.requestLayout();
 	}
 
 	static class RoundedButtonAttributes {
@@ -289,6 +341,7 @@ public abstract class RoundedButtonImpl {
 	}
 
 	interface RoundedButtonDelegate {
-		void onPaddingChanged(Rect insetPadding, Point shadowPadding);
+		void onPaddingChanged(int left, int top, int right, int bottom,
+		                      int horizontalShadowPadding, int verticalShadowPadding);
 	}
 }

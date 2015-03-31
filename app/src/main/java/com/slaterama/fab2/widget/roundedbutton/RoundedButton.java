@@ -8,30 +8,18 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.TypedValue;
 import android.widget.Button;
 
 import com.slaterama.fab2.R;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonDelegate;
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonAttributes;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.calculateOverlayPadding;
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.getResolvedSize;
 
 @SuppressWarnings("unused")
 public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
 
 	RoundedButtonImpl mImpl;
-
-	final Rect mContentPadding = new Rect();
-
-	float mCornerRadius;
-
-	boolean mPreventCornerOverlap;
-
-	final Rect mDrawablePadding = new Rect();
 
 	final Point mResolvedSize = new Point();
 
@@ -55,21 +43,16 @@ public class RoundedButton extends Button
 	}
 
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		RoundedButtonAttributes attributes = newOptions(context, attrs, defStyleAttr, defStyleRes);
-		mImpl = RoundedButtonImpl.newInstance(this, attributes);
-		mContentPadding.set(attributes.contentPadding);
-		mCornerRadius = attributes.cornerRadius;
-		mPreventCornerOverlap = attributes.preventCornerOverlap;
-		mImpl.invalidatePadding();
-		float density = context.getResources().getDisplayMetrics().density;
-		Log.d("RoundedButton", String.format("density=%f", density));
+		mImpl = RoundedButtonImpl.newInstance(this,
+				fillAttributes(context, attrs, defStyleAttr, defStyleRes));
 	}
 
-	RoundedButtonAttributes newOptions(Context context, AttributeSet attrs, int defStyleAttr,
+	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
 	                                int defStyleRes) {
 		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedButton,
 				defStyleAttr, defStyleRes);
+		int resId = R.styleable.RoundedButton_qslib_buttonColor;
 		attributes.color = a.getColorStateList(R.styleable.RoundedButton_qslib_buttonColor);
 		int defaultContentPadding = a.getDimensionPixelOffset(
 				R.styleable.RoundedButton_qslib_contentPadding, 0);
@@ -134,29 +117,23 @@ public class RoundedButton extends Button
 	}
 
 	public int getContentPaddingLeft() {
-		return mContentPadding.left;
+		return mImpl.getContentPadding().left;
 	}
 
 	public int getContentPaddingTop() {
-		return mContentPadding.top;
+		return mImpl.getContentPadding().top;
 	}
 
 	public int getContentPaddingRight() {
-		return mContentPadding.right;
+		return mImpl.getContentPadding().right;
 	}
 
 	public int getContentPaddingBottom() {
-		return mContentPadding.bottom;
+		return mImpl.getContentPadding().bottom;
 	}
 
 	public void setContentPadding(Rect contentPadding) {
-		if (contentPadding.left != mContentPadding.left
-				|| contentPadding.top != mContentPadding.top
-				|| contentPadding.right != mContentPadding.right
-				|| contentPadding.bottom != mContentPadding.bottom) {
-			mContentPadding.set(contentPadding);
-			mImpl.invalidatePadding();
-		}
+		mImpl.setContentPadding(contentPadding);
 	}
 
 	public float getCornerRadius() {
@@ -164,16 +141,7 @@ public class RoundedButton extends Button
 	}
 
 	public void setCornerRadius(float cornerRadius) {
-
-		// TODO add preventcorneroverlap to impl and have impl call invalidatepadding if appropriate
-
 		mImpl.setCornerRadius(cornerRadius);
-		if (cornerRadius != mCornerRadius) {
-			mCornerRadius = cornerRadius;
-			if (mPreventCornerOverlap) {
-				mImpl.invalidatePadding();
-			}
-		}
 	}
 
 	public float getSupportElevation() {
@@ -221,14 +189,11 @@ public class RoundedButton extends Button
 	}
 
 	public boolean isPreventCornerOverlap() {
-		return mPreventCornerOverlap;
+		return mImpl.isPreventCornerOverlap();
 	}
 
 	public void setPreventCornerOverlap(boolean preventCornerOverlap) {
-		if (preventCornerOverlap != mPreventCornerOverlap) {
-			mPreventCornerOverlap = preventCornerOverlap;
-			mImpl.invalidatePadding();
-		}
+		mImpl.setPreventCornerOverlap(preventCornerOverlap);
 	}
 
 	public float getSupportTranslationZ() {
@@ -258,27 +223,15 @@ public class RoundedButton extends Button
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		getResolvedSize(this, widthMeasureSpec, heightMeasureSpec, mCornerRadius, mDrawablePadding,
-				true, mResolvedSize);
+		mImpl.resolveSize(widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
 		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
 	}
 
 	@Override
-	public void onPaddingChanged(Rect insetPadding, Point shadowPadding) {
-		// TODO Clean? (Plus move mPreventCornerOverlap into impl and calculate overlay padding there
-		mDrawablePadding.set(
-				insetPadding.left + shadowPadding.x,
-				insetPadding.top + shadowPadding.y,
-				insetPadding.right + shadowPadding.x,
-				insetPadding.bottom + shadowPadding.y);
-		int overlayPadding = calculateOverlayPadding(mPreventCornerOverlap, mCornerRadius);
-		super.setPadding(
-				mDrawablePadding.left + overlayPadding + mContentPadding.left,
-				mDrawablePadding.top + overlayPadding + mContentPadding.top,
-				mDrawablePadding.right + overlayPadding + mContentPadding.right,
-				mDrawablePadding.bottom + overlayPadding + mContentPadding.bottom);
-		setMinWidth(getSuggestedMinimumWidth() + 2 * shadowPadding.x);
-		setMinHeight(getSuggestedMinimumHeight() + 2 * shadowPadding.y);
-		requestLayout();
+	public void onPaddingChanged(int left, int top, int right, int bottom,
+	                             int horizontalShadowPadding, int verticalShadowPadding) {
+		super.setPadding(left, top, right, bottom);
+		setMinimumWidth(getSuggestedMinimumWidth() + horizontalShadowPadding);
+		setMinimumHeight(getSuggestedMinimumHeight() + verticalShadowPadding);
 	}
 }
