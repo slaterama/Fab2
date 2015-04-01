@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.util.StateSet;
 import android.view.View;
 
@@ -21,7 +22,6 @@ public abstract class RoundedButtonImpl {
 	static int[] PRESSED_SPECS = new int[]{android.R.attr.state_pressed,
 			android.R.attr.state_enabled};
 	static int[] BASE_SPECS = new int[]{android.R.attr.state_enabled};
-	static int[][] SPECS_ARRAY = new int[][]{PRESSED_SPECS, BASE_SPECS, StateSet.WILD_CARD};
 
 	static String ELEVATION_PROPERTY = "elevation";
 	static String TRANSLATION_Z_PROPERTY = "translationZ";
@@ -85,13 +85,14 @@ public abstract class RoundedButtonImpl {
 		mTranslationZ = attributes.translationZ;
 		mUseCompatAnimation = attributes.useCompatAnimation;
 		mUseCompatPadding = attributes.useCompatPadding;
+
+		mRoundedButtonDrawable = newRoundedButtonDrawable();
+		setSupportBackground(mRoundedButtonDrawable);
+		invalidatePadding();
 	}
 
 	void initialize() {
-		mRoundedButtonDrawable = newRoundedButtonDrawable();
-		setSupportBackground(mRoundedButtonDrawable);
 		mRoundedButtonDrawable.initialize();
-		invalidatePadding();
 	}
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
@@ -261,14 +262,12 @@ public abstract class RoundedButtonImpl {
 	abstract class RoundedButtonDrawable extends Drawable {
 		boolean mInitialized;
 		int[] mPendingState;
+		int[] mCurrentSpecs;
+		ButtonState mButtonState;
 
 		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
-
-		public RoundedButtonDrawable() {
-			super();
-		}
 
 		void initialize() {
 			mInitialized = true;
@@ -307,21 +306,26 @@ public abstract class RoundedButtonImpl {
 		@Override
 		protected boolean onStateChange(int[] state) {
 			if (mInitialized) {
-//				animateShadowForState(state);
 				int color = mColor.getColorForState(state, mColor.getDefaultColor());
 				if (color != mPaint.getColor()) {
 					mPaint.setColor(color);
 					invalidateSelf();
+					ButtonState buttonState = ButtonState.fromState(state);
+					if (!buttonState.equals(mButtonState)) {
+						mButtonState = buttonState;
+						onButtonStateChange(buttonState);
+					}
 					return true;
 				}
 			} else {
 				mPendingState = state;
 			}
+
 			return super.onStateChange(state);
 		}
 
-//		void animateShadowForState(int[] state) {
-//		}
+		void onButtonStateChange(ButtonState buttonState) {
+		}
 
 		@Override
 		public void draw(Canvas canvas) {
@@ -406,5 +410,31 @@ public abstract class RoundedButtonImpl {
 		void setSupportTranslationZ(float translationZ);
 		void onPaddingChanged(int left, int top, int right, int bottom,
 		                      int horizontalShadowPadding, int verticalShadowPadding);
+	}
+
+	enum ButtonState {
+		PRESSED(PRESSED_SPECS),
+		DEFAULT(BASE_SPECS),
+		WILD_CARD(StateSet.WILD_CARD);
+
+		static ButtonState fromState(int[] state) {
+			ButtonState[] values = values();
+			for (ButtonState value : values) {
+				if (StateSet.stateSetMatches(value.mState, state)) {
+					return value;
+				}
+			}
+			return WILD_CARD;
+		}
+
+		int[] mState;
+
+		ButtonState(int[] state) {
+			mState = state;
+		}
+
+		public int[] getState() {
+			return mState;
+		}
 	}
 }

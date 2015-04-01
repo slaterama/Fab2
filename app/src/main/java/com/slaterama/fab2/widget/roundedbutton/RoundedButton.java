@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.Button;
 
 import com.slaterama.fab2.R;
@@ -98,13 +97,6 @@ public class RoundedButton extends Button
 		return attributes;
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void setElevation(float elevation) {
-		Log.w(TAG, "Use setSupportElevation instead");
-		super.setElevation(elevation);
-	}
-
 	@Override
 	public void setPadding(int left, int top, int right, int bottom) {
 		// NO OP
@@ -113,13 +105,6 @@ public class RoundedButton extends Button
 	@Override
 	public void setPaddingRelative(int start, int top, int end, int bottom) {
 		// NO OP
-	}
-
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void setTranslationZ(float translationZ) {
-		Log.w(TAG, "Use setSupportTranslationZ instead");
-		super.setTranslationZ(translationZ);
 	}
 
 	public ColorStateList getColor() {

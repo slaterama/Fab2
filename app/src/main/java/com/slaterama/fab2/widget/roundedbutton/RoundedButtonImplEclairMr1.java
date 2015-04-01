@@ -13,7 +13,6 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.StateSet;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -23,6 +22,10 @@ import com.slaterama.fab2.R;
 
 @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
 public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
+
+	// TODO How can I best capture when enabled changes and invalidate the shadow if so?
+	// It's already (kind of) happening in onStateChanged. Maybe instead of checking if the
+	// color changed, check if the STATE changed.
 
 	static void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
 	                          RectF cornerRect) {
@@ -56,12 +59,14 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 	}
 
-	static AnimationSet createAnimationForState(int[] state, View view,
+	static AnimationSet createAnimationForButtonState(ButtonState buttonState, View view,
 	                                            final RoundedButtonDelegate delegate,
 	                                            final float pressedTranslationZ) {
 		// TODO Close, but I might need an "mIsAnimating" variable. When that is set,
 		// setElevation will set mAnimatingElevation, and setTranslationZ will set
 		// mAnimatingTranslationZ.
+		// Need to "save" translationZ when an animation starts so it can be restored
+		// if the animation finishes or is canceled.
 
 		AnimationSet animationSet = new AnimationSet(false);
 		final int duration = view.getResources().getInteger(
@@ -74,24 +79,28 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		final int translationZDuration;
 		final int elevationDuration = 0;
 
-		if (StateSet.stateSetMatches(PRESSED_SPECS, state)) {
-			translationZFrom = delegate.getSupportTranslationZ();
-			translationZTo = pressedTranslationZ;
-			elevationFrom = delegate.getSupportElevation();
-			elevationTo = elevationFrom;
-			translationZDuration = duration;
-		} else if (StateSet.stateSetMatches(BASE_SPECS, state)) {
-			translationZFrom = delegate.getSupportTranslationZ();
-			translationZTo = 0f;
-			elevationFrom = delegate.getSupportElevation();
-			elevationTo = elevationFrom;
-			translationZDuration = duration;
-		} else {
-			translationZFrom = delegate.getSupportTranslationZ();
-			translationZTo = 0f;
-			elevationFrom = delegate.getSupportElevation();
-			elevationTo = 0f;
-			translationZDuration = 0;
+		switch (buttonState) {
+			case PRESSED:
+				translationZFrom = delegate.getSupportTranslationZ();
+				translationZTo = pressedTranslationZ;
+				elevationFrom = delegate.getSupportElevation();
+				elevationTo = elevationFrom;
+				translationZDuration = duration;
+				break;
+			case DEFAULT:
+				translationZFrom = delegate.getSupportTranslationZ();
+				translationZTo = 0f;
+				elevationFrom = delegate.getSupportElevation();
+				elevationTo = elevationFrom;
+				translationZDuration = duration;
+				break;
+			case WILD_CARD:
+			default:
+				translationZFrom = delegate.getSupportTranslationZ();
+				translationZTo = 0f;
+				elevationFrom = delegate.getSupportElevation();
+				elevationTo = 0f;
+				translationZDuration = 0;
 		}
 
 		Animation translationZAnimation = new Animation() {
@@ -174,7 +183,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		public RoundedButtonDrawableEclairMr1() {
 			super();
-			mShadowSize = mElevation + mTranslationZ;
+			mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
 
 			Resources resources = mView.getResources();
 			mAnimDuration = resources.getInteger(R.integer.qslib_button_pressed_animation_duration);
@@ -213,24 +222,21 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 
 		@Override
-		protected boolean onStateChange(int[] state) {
-			boolean retVal = super.onStateChange(state);
-			if (mInitialized) {
-				if (mShadowAnimationSet != null) {
-					mView.clearAnimation();
-				}
-				mShadowAnimationSet = createAnimationForState(state, mView, mDelegate,
-						mPressedTranslationZ);
-				mView.startAnimation(mShadowAnimationSet);
+		void onButtonStateChange(ButtonState buttonState) {
+			super.onButtonStateChange(buttonState);
+			if (mShadowAnimationSet != null) {
+				mView.clearAnimation();
 			}
-			return retVal;
+			mShadowAnimationSet = createAnimationForButtonState(buttonState, mView, mDelegate,
+					mPressedTranslationZ);
+			mView.startAnimation(mShadowAnimationSet);
 		}
 
 		@Override
 		public void draw(Canvas canvas) {
 			if (mShadowDirty) {
 				mShadowDirty = false;
-				mShadowSize = mElevation + mTranslationZ;
+				mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
 				buildComponents(getBounds());
 			}
 			float dy = mShadowSize / 2;
