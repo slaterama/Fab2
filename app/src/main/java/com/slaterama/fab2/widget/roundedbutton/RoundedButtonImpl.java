@@ -305,6 +305,9 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
+
+			// TODO This is wrong. Check button state outside of color check
+
 			if (mInitialized) {
 				int color = mColor.getColorForState(state, mColor.getDefaultColor());
 				if (color != mPaint.getColor()) {
@@ -325,11 +328,7 @@ public abstract class RoundedButtonImpl {
 		}
 
 		void onButtonStateChange(ButtonState buttonState) {
-		}
-
-		@Override
-		public void draw(Canvas canvas) {
-			canvas.drawRect(mBounds, mPaint);
+			Log.d("RoundedButton", String.format("buttonState=%s", buttonState));
 		}
 
 		void invalidateBounds(Rect bounds, boolean invalidate) {
