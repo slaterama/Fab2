@@ -18,7 +18,7 @@ public class RoundedButtonImplJellybeanMr1 extends RoundedButtonImplJellybean {
 		return new RoundedButtonDrawableJellybeanMr1();
 	}
 
-	class RoundedButtonDrawableJellybeanMr1 extends RoundedButtonDrawableEclairMr1 {
+	class RoundedButtonDrawableJellybeanMr1 extends RoundedButtonDrawableHoneycomb {
 		@Override
 		protected void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint) {
 			canvas.drawRoundRect(rect, rx, ry, paint);

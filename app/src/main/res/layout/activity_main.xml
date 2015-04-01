@@ -23,7 +23,11 @@
 		android:text="@string/hello_world"
 		app:qslib_cornerRadius="8dp"
 		app:qslib_useCompatAnimation="true"
-		app:qslib_useCompatPadding="true"/>
+		app:qslib_useCompatPadding="true"
+		app:qslib_elevation="4dp"
+		app:qslib_pressedTranslationZ="8dp"
+		app:qslib_maxElevation="12dp"
+		/>
 
 	<Button
 		android:id="@+id/button"

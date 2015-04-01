@@ -166,7 +166,9 @@ public class RoundedButton extends Button
 	}
 
 	public void setSupportElevation(float elevation) {
-		mImpl.setElevation(elevation);
+		if (mImpl != null) {
+			mImpl.setElevation(elevation);
+		}
 	}
 
 	public int getInsetPaddingLeft() {
@@ -218,7 +220,9 @@ public class RoundedButton extends Button
 	}
 
 	public void setSupportTranslationZ(float translationZ) {
-		mImpl.setTranslationZ(translationZ);
+		if (mImpl != null) {
+			mImpl.setTranslationZ(translationZ);
+		}
 	}
 
 	public boolean isUseCompatAnimation() {

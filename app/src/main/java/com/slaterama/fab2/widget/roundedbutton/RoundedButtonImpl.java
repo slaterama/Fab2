@@ -25,6 +25,8 @@ public abstract class RoundedButtonImpl {
 
 	static String ELEVATION_PROPERTY = "elevation";
 	static String TRANSLATION_Z_PROPERTY = "translationZ";
+	static String SUPPORT_ELEVATION_PROPERTY = "supportElevation";
+	static String SUPPORT_TRANSLATION_Z_PROPERTY = "supportTranslationZ";
 
 	// used to calculate overlap padding
 	static final double COS_45 = Math.cos(Math.toRadians(45));
@@ -290,6 +292,7 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
+			animateShadowForState(state);
 			int color = mColor.getColorForState(state, mColor.getDefaultColor());
 			if (color != mPaint.getColor()) {
 				mPaint.setColor(color);
@@ -298,6 +301,9 @@ public abstract class RoundedButtonImpl {
 			} else {
 				return super.onStateChange(state);
 			}
+		}
+
+		void animateShadowForState(int[] state) {
 		}
 
 		@Override
@@ -328,6 +334,9 @@ public abstract class RoundedButtonImpl {
 
 		void invalidateBounds() {
 			invalidateBounds(getBounds(), true);
+		}
+
+		void invalidateShadow() {
 		}
 	}
 

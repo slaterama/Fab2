@@ -19,7 +19,8 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 		StateListAnimator stateListAnimator = new StateListAnimator();
 		for (int[] specs : SPECS_ARRAY) {
 			stateListAnimator.addState(specs, createAnimatorForState(
-					specs, view, elevation, pressedTranslationZ));
+					specs, view, ELEVATION_PROPERTY, TRANSLATION_Z_PROPERTY,
+					elevation, pressedTranslationZ));
 		}
 		return stateListAnimator;
 	}
@@ -103,6 +104,11 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 		@Override
 		public void draw(Canvas canvas) {
 			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+		}
+
+		@Override
+		void animateShadowForState(int[] state) {
+			// NO OP
 		}
 	}
 }

@@ -52,8 +52,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 	}
 
-	RoundedButtonDrawableEclairMr1 mRoundedButtonDrawableEclairMr1;
-
 	final RectF mCornerRect = new RectF();
 
 	public RoundedButtonImplEclairMr1(View view, RoundedButtonAttributes attributes) {
@@ -62,8 +60,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
-		mRoundedButtonDrawableEclairMr1 = new RoundedButtonDrawableEclairMr1();
-		return mRoundedButtonDrawableEclairMr1;
+		return new RoundedButtonDrawableEclairMr1();
 	}
 
 	@Override
@@ -83,12 +80,12 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 	@Override
 	void onElevationChanged(float elevation) {
-		mRoundedButtonDrawableEclairMr1.invalidateShadow();
+		mRoundedButtonDrawable.invalidateShadow();
 	}
 
 	@Override
 	void onTranslationZChanged(float translationZ) {
-		mRoundedButtonDrawableEclairMr1.invalidateShadow();
+		mRoundedButtonDrawable.invalidateShadow();
 	}
 
 	class RoundedButtonDrawableEclairMr1 extends RoundedButtonDrawable {
@@ -108,7 +105,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		public RoundedButtonDrawableEclairMr1() {
 			super();
-			mShadowSize = mElevation;
+			mShadowSize = mElevation + mTranslationZ;
 
 			Resources resources = mView.getResources();
 			mAnimDuration = resources.getInteger(R.integer.qslib_button_pressed_animation_duration);
@@ -157,6 +154,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		public void draw(Canvas canvas) {
 			if (mShadowDirty) {
 				mShadowDirty = false;
+				mShadowSize = mElevation + mTranslationZ;
 				buildComponents(getBounds());
 			}
 			float dy = mShadowSize / 2;
@@ -166,6 +164,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
+		@Override
 		void invalidateShadow() {
 			mShadowDirty = true;
 			invalidateSelf();
