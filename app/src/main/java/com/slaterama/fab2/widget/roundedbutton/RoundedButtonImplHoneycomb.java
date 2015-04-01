@@ -4,7 +4,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.util.Log;
 import android.util.StateSet;
 import android.view.View;
 

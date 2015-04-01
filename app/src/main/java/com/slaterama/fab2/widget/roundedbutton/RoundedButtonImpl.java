@@ -85,9 +85,12 @@ public abstract class RoundedButtonImpl {
 		mTranslationZ = attributes.translationZ;
 		mUseCompatAnimation = attributes.useCompatAnimation;
 		mUseCompatPadding = attributes.useCompatPadding;
+	}
 
+	void initialize() {
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
 		setSupportBackground(mRoundedButtonDrawable);
+		mRoundedButtonDrawable.initialize();
 		invalidatePadding();
 	}
 
@@ -256,12 +259,18 @@ public abstract class RoundedButtonImpl {
 	}
 
 	abstract class RoundedButtonDrawable extends Drawable {
+		boolean mInitialized;
 		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
 
 		public RoundedButtonDrawable() {
 			super();
+		}
+
+		void initialize() {
+			mInitialized = true;
+			onStateChange(getState());
 		}
 
 		@Override
@@ -292,15 +301,16 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
-			animateShadowForState(state);
-			int color = mColor.getColorForState(state, mColor.getDefaultColor());
-			if (color != mPaint.getColor()) {
-				mPaint.setColor(color);
-				invalidateSelf();
-				return true;
-			} else {
-				return super.onStateChange(state);
+			if (mInitialized) {
+				animateShadowForState(state);
+				int color = mColor.getColorForState(state, mColor.getDefaultColor());
+				if (color != mPaint.getColor()) {
+					mPaint.setColor(color);
+					invalidateSelf();
+					return true;
+				}
 			}
+			return super.onStateChange(state);
 		}
 
 		void animateShadowForState(int[] state) {

@@ -48,6 +48,7 @@ public class RoundedButton extends Button
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		mImpl = RoundedButtonImpl.newInstance(this,
 				fillAttributes(context, attrs, defStyleAttr, defStyleRes));
+		mImpl.initialize();
 	}
 
 	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
@@ -166,9 +167,7 @@ public class RoundedButton extends Button
 	}
 
 	public void setSupportElevation(float elevation) {
-		if (mImpl != null) {
-			mImpl.setElevation(elevation);
-		}
+		mImpl.setElevation(elevation);
 	}
 
 	public int getInsetPaddingLeft() {
@@ -220,9 +219,7 @@ public class RoundedButton extends Button
 	}
 
 	public void setSupportTranslationZ(float translationZ) {
-		if (mImpl != null) {
-			mImpl.setTranslationZ(translationZ);
-		}
+		mImpl.setTranslationZ(translationZ);
 	}
 
 	public boolean isUseCompatAnimation() {
