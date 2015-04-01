@@ -260,6 +260,8 @@ public abstract class RoundedButtonImpl {
 
 	abstract class RoundedButtonDrawable extends Drawable {
 		boolean mInitialized;
+		int[] mPendingState;
+
 		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
@@ -270,7 +272,10 @@ public abstract class RoundedButtonImpl {
 
 		void initialize() {
 			mInitialized = true;
-			onStateChange(getState());
+			if (mPendingState != null) {
+				onStateChange(mPendingState);
+				mPendingState = null;
+			}
 		}
 
 		@Override
@@ -309,6 +314,8 @@ public abstract class RoundedButtonImpl {
 					invalidateSelf();
 					return true;
 				}
+			} else {
+				mPendingState = state;
 			}
 			return super.onStateChange(state);
 		}
