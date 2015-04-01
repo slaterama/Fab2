@@ -106,9 +106,11 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
+		/*
 		@Override
 		void animateShadowForState(int[] state) {
 			// NO OP
 		}
+		*/
 	}
 }

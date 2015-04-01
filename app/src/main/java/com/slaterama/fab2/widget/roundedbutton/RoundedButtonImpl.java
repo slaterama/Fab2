@@ -307,7 +307,7 @@ public abstract class RoundedButtonImpl {
 		@Override
 		protected boolean onStateChange(int[] state) {
 			if (mInitialized) {
-				animateShadowForState(state);
+//				animateShadowForState(state);
 				int color = mColor.getColorForState(state, mColor.getDefaultColor());
 				if (color != mPaint.getColor()) {
 					mPaint.setColor(color);
@@ -320,8 +320,8 @@ public abstract class RoundedButtonImpl {
 			return super.onStateChange(state);
 		}
 
-		void animateShadowForState(int[] state) {
-		}
+//		void animateShadowForState(int[] state) {
+//		}
 
 		@Override
 		public void draw(Canvas canvas) {
@@ -400,6 +400,10 @@ public abstract class RoundedButtonImpl {
 	}
 
 	interface RoundedButtonDelegate {
+		float getSupportElevation();
+		void setSupportElevation(float elevation);
+		float getSupportTranslationZ();
+		void setSupportTranslationZ(float translationZ);
 		void onPaddingChanged(int left, int top, int right, int bottom,
 		                      int horizontalShadowPadding, int verticalShadowPadding);
 	}

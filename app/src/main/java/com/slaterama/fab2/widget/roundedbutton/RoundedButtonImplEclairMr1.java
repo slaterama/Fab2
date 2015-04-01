@@ -13,7 +13,11 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.StateSet;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.Transformation;
 
 import com.slaterama.fab2.R;
 
@@ -50,6 +54,69 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			canvas.drawRect(rect.left, (float) Math.floor(rect.top + ry), rect.right,
 					(float) Math.ceil(rect.bottom - ry), paint);
 		}
+	}
+
+	static AnimationSet createAnimationForState(int[] state, View view,
+	                                            final RoundedButtonDelegate delegate,
+	                                            final float pressedTranslationZ) {
+		// TODO Close, but I might need an "mIsAnimating" variable. When that is set,
+		// setElevation will set mAnimatingElevation, and setTranslationZ will set
+		// mAnimatingTranslationZ.
+
+		AnimationSet animationSet = new AnimationSet(false);
+		final int duration = view.getResources().getInteger(
+				R.integer.qslib_button_pressed_animation_duration);
+
+		final float translationZFrom;
+		final float translationZTo;
+		final float elevationFrom;
+		final float elevationTo;
+		final int translationZDuration;
+		final int elevationDuration = 0;
+
+		if (StateSet.stateSetMatches(PRESSED_SPECS, state)) {
+			translationZFrom = delegate.getSupportTranslationZ();
+			translationZTo = pressedTranslationZ;
+			elevationFrom = delegate.getSupportElevation();
+			elevationTo = elevationFrom;
+			translationZDuration = duration;
+		} else if (StateSet.stateSetMatches(BASE_SPECS, state)) {
+			translationZFrom = delegate.getSupportTranslationZ();
+			translationZTo = 0f;
+			elevationFrom = delegate.getSupportElevation();
+			elevationTo = elevationFrom;
+			translationZDuration = duration;
+		} else {
+			translationZFrom = delegate.getSupportTranslationZ();
+			translationZTo = 0f;
+			elevationFrom = delegate.getSupportElevation();
+			elevationTo = 0f;
+			translationZDuration = 0;
+		}
+
+		Animation translationZAnimation = new Animation() {
+			@Override
+			protected void applyTransformation(float interpolatedTime, Transformation t) {
+				float interpolatedTranslationZ = translationZFrom +
+						(translationZTo - translationZFrom) * interpolatedTime;
+				delegate.setSupportTranslationZ(interpolatedTranslationZ);
+			}
+		};
+		Animation elevationAnimation = new Animation() {
+			@Override
+			protected void applyTransformation(float interpolatedTime, Transformation t) {
+				float interpolatedElevation = elevationFrom +
+						(elevationTo - elevationFrom) * interpolatedTime;
+				delegate.setSupportElevation(interpolatedElevation);
+			}
+		};
+		translationZAnimation.setDuration(translationZDuration);
+		elevationAnimation.setDuration(elevationDuration);
+		elevationAnimation.setFillAfter(true);
+		translationZAnimation.setFillAfter(true);
+		animationSet.addAnimation(translationZAnimation);
+		animationSet.addAnimation(elevationAnimation);
+		return animationSet;
 	}
 
 	final RectF mCornerRect = new RectF();
@@ -103,6 +170,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		boolean mShadowDirty = true;
 
+		AnimationSet mShadowAnimationSet;
+
 		public RoundedButtonDrawableEclairMr1() {
 			super();
 			mShadowSize = mElevation + mTranslationZ;
@@ -146,7 +215,14 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		@Override
 		protected boolean onStateChange(int[] state) {
 			boolean retVal = super.onStateChange(state);
-			// TODO Handle animations
+			if (mInitialized) {
+				if (mShadowAnimationSet != null) {
+					mView.clearAnimation();
+				}
+				mShadowAnimationSet = createAnimationForState(state, mView, mDelegate,
+						mPressedTranslationZ);
+				mView.startAnimation(mShadowAnimationSet);
+			}
 			return retVal;
 		}
 

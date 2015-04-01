@@ -162,14 +162,6 @@ public class RoundedButton extends Button
 		mImpl.setCornerRadius(cornerRadius);
 	}
 
-	public float getSupportElevation() {
-		return mImpl.getElevation();
-	}
-
-	public void setSupportElevation(float elevation) {
-		mImpl.setElevation(elevation);
-	}
-
 	public int getInsetPaddingLeft() {
 		return mImpl.getInsetPadding().left;
 	}
@@ -214,10 +206,22 @@ public class RoundedButton extends Button
 		mImpl.setPreventCornerOverlap(preventCornerOverlap);
 	}
 
+	@Override
+	public float getSupportElevation() {
+		return mImpl.getElevation();
+	}
+
+	@Override
+	public void setSupportElevation(float elevation) {
+		mImpl.setElevation(elevation);
+	}
+
+	@Override
 	public float getSupportTranslationZ() {
 		return mImpl.getTranslationZ();
 	}
 
+	@Override
 	public void setSupportTranslationZ(float translationZ) {
 		mImpl.setTranslationZ(translationZ);
 	}

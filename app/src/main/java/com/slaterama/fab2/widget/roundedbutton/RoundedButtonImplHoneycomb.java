@@ -15,6 +15,11 @@ public class RoundedButtonImplHoneycomb extends RoundedButtonImplEclairMr1 {
 	static AnimatorSet createAnimatorForState(
 			int[] state, View view, String evelationPropertyName, String translationZPropertyName,
 			float elevation, float pressedTranslationZ) {
+
+		// TODO Close, but I might need an "mIsAnimating" variable. When that is set,
+		// setElevation will set mAnimatingElevation, and setTranslationZ will set
+		// mAnimatingTranslationZ.
+
 		AnimatorSet animator = new AnimatorSet();
 		int duration = view.getResources().getInteger(
 				R.integer.qslib_button_pressed_animation_duration);
@@ -44,14 +49,18 @@ public class RoundedButtonImplHoneycomb extends RoundedButtonImplEclairMr1 {
 		AnimatorSet mShadowAnimatorSet;
 
 		@Override
-		void animateShadowForState(int[] state) {
-			if (mShadowAnimatorSet != null) {
-				mShadowAnimatorSet.cancel();
+		protected boolean onStateChange(int[] state) {
+			boolean retVal = super.onStateChange(state);
+			if (mInitialized) {
+				if (mShadowAnimatorSet != null) {
+					mShadowAnimatorSet.cancel();
+				}
+				mShadowAnimatorSet = createAnimatorForState(state, mView,
+						SUPPORT_ELEVATION_PROPERTY, SUPPORT_TRANSLATION_Z_PROPERTY,
+						mElevation, mPressedTranslationZ);
+				mShadowAnimatorSet.start();
 			}
-			mShadowAnimatorSet = createAnimatorForState(state, mView,
-					SUPPORT_ELEVATION_PROPERTY, SUPPORT_TRANSLATION_Z_PROPERTY,
-					mElevation, mPressedTranslationZ);
-			mShadowAnimatorSet.start();
+			return retVal;
 		}
 	}
 }
