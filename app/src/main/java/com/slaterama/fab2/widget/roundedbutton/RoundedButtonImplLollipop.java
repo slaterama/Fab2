@@ -14,14 +14,13 @@ import android.view.View;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 
-	static StateListAnimator generateStateListAnimator(View view, float elevation,
-	                                                   float pressedTranslationZ) {
+	static StateListAnimator createStateListAnimator(View view, float elevation,
+	                                                 float pressedTranslationZ) {
 		StateListAnimator stateListAnimator = new StateListAnimator();
 		ButtonState[] values = ButtonState.values();
 		for (ButtonState value : values) {
-			stateListAnimator.addState(value.getState(), createAnimatorForButtonState(
-					value, view, ELEVATION_PROPERTY, TRANSLATION_Z_PROPERTY,
-					elevation, pressedTranslationZ));
+			stateListAnimator.addState(value.getState(), createAnimator(value, view,
+					ELEVATION_PROPERTY, TRANSLATION_Z_PROPERTY, elevation, pressedTranslationZ));
 		}
 		return stateListAnimator;
 	}
@@ -34,7 +33,7 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 		view.setTranslationZ(attributes.translationZ);
 		if (mUseCompatAnimation) {
 			mSavedStateListAnimator = view.getStateListAnimator();
-			view.setStateListAnimator(generateStateListAnimator(mView, mElevation,
+			view.setStateListAnimator(createStateListAnimator(mView, mElevation,
 					mPressedTranslationZ));
 		}
 		view.setClipToOutline(true);
@@ -74,7 +73,7 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 	void onUseCompatAnimationChanged(boolean useCompatAnimation) {
 		if (useCompatAnimation) {
 			mSavedStateListAnimator = mView.getStateListAnimator();
-			mView.setStateListAnimator(generateStateListAnimator(mView, mElevation,
+			mView.setStateListAnimator(createStateListAnimator(mView, mEnabledElevation,
 					mPressedTranslationZ));
 		} else {
 			mView.setStateListAnimator(mSavedStateListAnimator);

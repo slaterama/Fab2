@@ -1,7 +1,6 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
 import android.content.res.ColorStateList;
-import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -54,6 +53,7 @@ public abstract class RoundedButtonImpl {
 	float mCornerRadius;
 	int mDiameter;
 	float mElevation;
+	float mEnabledElevation;
 	final Rect mInsetPadding;
 	float mMaxElevation;
 	float mPressedTranslationZ;
@@ -78,6 +78,7 @@ public abstract class RoundedButtonImpl {
 		mCornerRadius = attributes.cornerRadius;
 		mDiameter = Math.round(attributes.cornerRadius + 2);
 		mElevation = attributes.elevation;
+		mEnabledElevation = mElevation;
 		mInsetPadding = new Rect(attributes.insetPadding);
 		mMaxElevation = attributes.maxElevation;
 		mPressedTranslationZ = attributes.pressedTranslationZ;
@@ -139,6 +140,9 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setElevation(float elevation) {
+		if (mView.isEnabled()) {
+			mEnabledElevation = elevation;
+		}
 		if (elevation != mElevation) {
 			mElevation = elevation;
 			onElevationChanged(elevation);
@@ -305,19 +309,16 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
-
-			// TODO This is wrong. Check button state outside of color check
-
 			if (mInitialized) {
+				ButtonState buttonState = ButtonState.fromState(state);
+				if (!buttonState.equals(mButtonState)) {
+					mButtonState = buttonState;
+					onButtonStateChange(buttonState);
+				}
 				int color = mColor.getColorForState(state, mColor.getDefaultColor());
 				if (color != mPaint.getColor()) {
 					mPaint.setColor(color);
 					invalidateSelf();
-					ButtonState buttonState = ButtonState.fromState(state);
-					if (!buttonState.equals(mButtonState)) {
-						mButtonState = buttonState;
-						onButtonStateChange(buttonState);
-					}
 					return true;
 				}
 			} else {
@@ -328,7 +329,6 @@ public abstract class RoundedButtonImpl {
 		}
 
 		void onButtonStateChange(ButtonState buttonState) {
-			Log.d("RoundedButton", String.format("buttonState=%s", buttonState));
 		}
 
 		void invalidateBounds(Rect bounds, boolean invalidate) {

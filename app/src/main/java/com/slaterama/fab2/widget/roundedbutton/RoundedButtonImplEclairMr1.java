@@ -37,7 +37,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			final float twoRy = ry * 2;
 			final float innerWidth = rect.width() - twoRx;
 			final float innerHeight = rect.height() - twoRy;
-			
+
 			cornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
 
 			canvas.drawArc(cornerRect, 180, 90, true, paint);
@@ -59,50 +59,34 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		}
 	}
 
-	static AnimationSet createAnimationForButtonState(ButtonState buttonState, View view,
-	                                            final RoundedButtonDelegate delegate,
-	                                            final float pressedTranslationZ) {
-		// TODO Close, but I might need an "mIsAnimating" variable. When that is set,
-		// setElevation will set mAnimatingElevation, and setTranslationZ will set
-		// mAnimatingTranslationZ.
-		// Need to "save" translationZ when an animation starts so it can be restored
-		// if the animation finishes or is canceled.
-
+	static AnimationSet createAnimation(ButtonState buttonState, View view,
+	                                    final RoundedButtonDelegate delegate,
+	                                    final float elevation, final float pressedTranslationZ) {
 		AnimationSet animationSet = new AnimationSet(false);
-		final int duration = view.getResources().getInteger(
-				R.integer.qslib_button_pressed_animation_duration);
-
-		final float translationZFrom;
+		final float translationZFrom = delegate.getSupportTranslationZ();
+		final float elevationFrom = delegate.getSupportElevation();
 		final float translationZTo;
-		final float elevationFrom;
 		final float elevationTo;
 		final int translationZDuration;
-		final int elevationDuration = 0;
-
 		switch (buttonState) {
 			case PRESSED:
-				translationZFrom = delegate.getSupportTranslationZ();
 				translationZTo = pressedTranslationZ;
-				elevationFrom = delegate.getSupportElevation();
-				elevationTo = elevationFrom;
-				translationZDuration = duration;
+				elevationTo = elevation;
+				translationZDuration = view.getResources().getInteger(
+						R.integer.qslib_button_pressed_animation_duration);
 				break;
 			case DEFAULT:
-				translationZFrom = delegate.getSupportTranslationZ();
 				translationZTo = 0f;
-				elevationFrom = delegate.getSupportElevation();
-				elevationTo = elevationFrom;
-				translationZDuration = duration;
+				elevationTo = elevation;
+				translationZDuration = view.getResources().getInteger(
+						R.integer.qslib_button_pressed_animation_duration);
 				break;
 			case WILD_CARD:
 			default:
-				translationZFrom = delegate.getSupportTranslationZ();
 				translationZTo = 0f;
-				elevationFrom = delegate.getSupportElevation();
 				elevationTo = 0f;
 				translationZDuration = 0;
 		}
-
 		Animation translationZAnimation = new Animation() {
 			@Override
 			protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -120,7 +104,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			}
 		};
 		translationZAnimation.setDuration(translationZDuration);
-		elevationAnimation.setDuration(elevationDuration);
+		elevationAnimation.setDuration(0);
 		elevationAnimation.setFillAfter(true);
 		translationZAnimation.setFillAfter(true);
 		animationSet.addAnimation(translationZAnimation);
@@ -223,12 +207,11 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		@Override
 		void onButtonStateChange(ButtonState buttonState) {
-			super.onButtonStateChange(buttonState);
 			if (mShadowAnimationSet != null) {
 				mView.clearAnimation();
 			}
-			mShadowAnimationSet = createAnimationForButtonState(buttonState, mView, mDelegate,
-					mPressedTranslationZ);
+			mShadowAnimationSet = createAnimation(buttonState, mView, mDelegate,
+					mEnabledElevation, mPressedTranslationZ);
 			mView.startAnimation(mShadowAnimationSet);
 		}
 
