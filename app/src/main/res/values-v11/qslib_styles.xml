@@ -66,34 +66,34 @@
 
 	<style name="Widget.Holo.FloatingActionButton" parent="android:Widget.Holo.ImageButton">
 		<item name="qslib_buttonColor">@color/qslib_fab_default_holo_dark</item>
-		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
-		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
-		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
-		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
-		<item name="qslib_insetPaddingTop">@dimen/qslib_rounded_btn_inset_padding_vertical</item>
-		<item name="qslib_insetPaddingRight">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
-		<item name="qslib_insetPaddingBottom">@dimen/qslib_rounded_btn_inset_padding_vertical</item>
-		<item name="qslib_contentPaddingLeft">@dimen/qslib_rounded_btn_content_padding_horizontal</item>
-		<item name="qslib_contentPaddingTop">@dimen/qslib_rounded_btn_content_padding_vertical</item>
-		<item name="qslib_contentPaddingRight">@dimen/qslib_rounded_btn_content_padding_horizontal</item>
-		<item name="qslib_contentPaddingBottom">@dimen/qslib_rounded_btn_content_padding_vertical</item>
+		<item name="qslib_cornerRadius">@dimen/qslib_fab_corner_radius</item>
+		<item name="qslib_elevation">@dimen/qslib_fab_elevation</item>
+		<item name="qslib_pressedTranslationZ">@dimen/qslib_fab_pressed_translation_z</item>
+		<item name="qslib_maxElevation">@dimen/qslib_fab_max_elevation</item>
+		<item name="qslib_insetPaddingLeft">@dimen/qslib_fab_inset_padding_horizontal</item>
+		<item name="qslib_insetPaddingTop">@dimen/qslib_fab_inset_padding_vertical</item>
+		<item name="qslib_insetPaddingRight">@dimen/qslib_fab_inset_padding_horizontal</item>
+		<item name="qslib_insetPaddingBottom">@dimen/qslib_fab_inset_padding_vertical</item>
+		<item name="qslib_contentPaddingLeft">@dimen/qslib_fab_content_padding_horizontal</item>
+		<item name="qslib_contentPaddingTop">@dimen/qslib_fab_content_padding_vertical</item>
+		<item name="qslib_contentPaddingRight">@dimen/qslib_fab_content_padding_horizontal</item>
+		<item name="qslib_contentPaddingBottom">@dimen/qslib_fab_content_padding_vertical</item>
 	</style>
 
 	<style name="Widget.Holo.Light.FloatingActionButton" parent="android:Widget.Holo.Light.ImageButton">
 		<item name="qslib_buttonColor">@color/qslib_fab_default_holo_light</item>
-		<item name="qslib_cornerRadius">@dimen/qslib_rounded_btn_corner_radius</item>
-		<item name="qslib_elevation">@dimen/qslib_rounded_btn_elevation</item>
-		<item name="qslib_pressedTranslationZ">@dimen/qslib_rounded_btn_pressed_translation_z</item>
-		<item name="qslib_maxElevation">@dimen/qslib_rounded_btn_max_elevation</item>
-		<item name="qslib_insetPaddingLeft">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
-		<item name="qslib_insetPaddingTop">@dimen/qslib_rounded_btn_inset_padding_vertical</item>
-		<item name="qslib_insetPaddingRight">@dimen/qslib_rounded_btn_inset_padding_horizontal</item>
-		<item name="qslib_insetPaddingBottom">@dimen/qslib_rounded_btn_inset_padding_vertical</item>
-		<item name="qslib_contentPaddingLeft">@dimen/qslib_rounded_btn_content_padding_horizontal</item>
-		<item name="qslib_contentPaddingTop">@dimen/qslib_rounded_btn_content_padding_vertical</item>
-		<item name="qslib_contentPaddingRight">@dimen/qslib_rounded_btn_content_padding_horizontal</item>
-		<item name="qslib_contentPaddingBottom">@dimen/qslib_rounded_btn_content_padding_vertical</item>
+		<item name="qslib_cornerRadius">@dimen/qslib_fab_corner_radius</item>
+		<item name="qslib_elevation">@dimen/qslib_fab_elevation</item>
+		<item name="qslib_pressedTranslationZ">@dimen/qslib_fab_pressed_translation_z</item>
+		<item name="qslib_maxElevation">@dimen/qslib_fab_max_elevation</item>
+		<item name="qslib_insetPaddingLeft">@dimen/qslib_fab_inset_padding_horizontal</item>
+		<item name="qslib_insetPaddingTop">@dimen/qslib_fab_inset_padding_vertical</item>
+		<item name="qslib_insetPaddingRight">@dimen/qslib_fab_inset_padding_horizontal</item>
+		<item name="qslib_insetPaddingBottom">@dimen/qslib_fab_inset_padding_vertical</item>
+		<item name="qslib_contentPaddingLeft">@dimen/qslib_fab_content_padding_horizontal</item>
+		<item name="qslib_contentPaddingTop">@dimen/qslib_fab_content_padding_vertical</item>
+		<item name="qslib_contentPaddingRight">@dimen/qslib_fab_content_padding_horizontal</item>
+		<item name="qslib_contentPaddingBottom">@dimen/qslib_fab_content_padding_vertical</item>
 	</style>
 
 	<style name="Widget.Holo.FloatingActionButton.Small">

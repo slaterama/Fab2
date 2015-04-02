@@ -76,7 +76,7 @@ public abstract class RoundedButtonImpl {
 		mColor = attributes.color;
 		mContentPadding = new Rect(attributes.contentPadding);
 		mCornerRadius = attributes.cornerRadius;
-		mDiameter = Math.round(attributes.cornerRadius + 2);
+		mDiameter = Math.round(attributes.cornerRadius * 2);
 		mElevation = attributes.elevation;
 		mEnabledElevation = mElevation;
 		mInsetPadding = new Rect(attributes.insetPadding);
