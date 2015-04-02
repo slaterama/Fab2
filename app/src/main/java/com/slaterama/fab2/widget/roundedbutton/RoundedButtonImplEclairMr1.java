@@ -38,7 +38,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			final float twoRy = ry * 2;
 			final float innerWidth = rect.width() - twoRx;
 			final float innerHeight = rect.height() - twoRy;
-
 			cornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
 
 			canvas.drawArc(cornerRect, 180, 90, true, paint);
@@ -167,6 +166,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		final RectF mOuterBounds = new RectF();
 
 		AnimationSet mShadowAnimationSet;
+		boolean mSkipShadow;
 
 		/**
 		 * If shadow size is set to a value above max shadow, we print a warning
@@ -218,6 +218,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			}
 			mShadowAnimationSet = createAnimation(buttonState, mView, mDelegate,
 					mEnabledElevation, mPressedTranslationZ);
+			mSkipShadow = true;
 			mView.startAnimation(mShadowAnimationSet);
 		}
 
@@ -226,9 +227,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			if (mShadowDirty) {
 				mShadowDirty = false;
 				mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
-
-				Log.d("RoundedButton", String.format("mElevation=%.2f, mTranslationZ=%.2f, mShadowSize=%.2f", mElevation, mTranslationZ, mShadowSize));
-
 				if (mShadowSize > mMaxElevation) {
 					mShadowSize = mMaxElevation;
 					if (!mPrintedShadowClipWarning) {
@@ -241,10 +239,14 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				buildComponents(getBounds());
 			}
 
-			float dy = mShadowSize / 2;
-			canvas.translate(0, dy);
-			drawShadow(canvas);
-			canvas.translate(0, -dy);
+			if (mSkipShadow) {
+				mSkipShadow = false;
+			} else {
+				float dy = mShadowSize / 2;
+				canvas.translate(0, dy);
+				drawShadow(canvas);
+				canvas.translate(0, -dy);
+			}
 			drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
