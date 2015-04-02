@@ -8,13 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.slaterama.fab2.widget.roundedbutton.FloatingActionButton;
 import com.slaterama.fab2.widget.roundedbutton.RoundedButton;
+import com.slaterama.fab2.widget.roundedbutton.RoundedImageButton;
 
 
 public class MainActivity extends Activity {
 
 	RoundedButton mRoundedButton;
 	Button mButton;
+	RoundedImageButton mRoundedImageButton;
+	FloatingActionButton mFloatingActionButton;
+	FloatingActionButton mSmallFloatingActionButton;
 	CheckBox mCheckBox;
 
 	@Override
@@ -23,6 +28,10 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		mRoundedButton = (RoundedButton) findViewById(R.id.roundedbutton);
 		mButton = (Button) findViewById(R.id.button);
+		mRoundedImageButton = (RoundedImageButton) findViewById(R.id.roundedimagebutton);
+		mFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingactionbutton);
+		mSmallFloatingActionButton = (FloatingActionButton)
+				findViewById(R.id.smallfloatingactionbutton);
 		mCheckBox = (CheckBox) findViewById(R.id.checkbox);
 		mCheckBox.setChecked(mRoundedButton.isEnabled());
 	}
@@ -53,8 +62,12 @@ public class MainActivity extends Activity {
 		int id = v.getId();
 		switch (id) {
 			case R.id.checkbox:
-				mRoundedButton.setEnabled(mCheckBox.isChecked());
-				mButton.setEnabled(mCheckBox.isChecked());
+				boolean enabled = mCheckBox.isChecked();
+				mRoundedButton.setEnabled(enabled);
+				mButton.setEnabled(enabled);
+				mRoundedImageButton.setEnabled(enabled);
+				mFloatingActionButton.setEnabled(enabled);
+				mSmallFloatingActionButton.setEnabled(enabled);
 				break;
 		}
 	}

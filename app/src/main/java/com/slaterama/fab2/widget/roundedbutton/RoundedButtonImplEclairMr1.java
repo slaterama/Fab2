@@ -163,6 +163,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		float mShadowSize;
 
 		boolean mShadowDirty = true;
+		final RectF mInnerBounds = new RectF();
+		final RectF mOuterBounds = new RectF();
 
 		AnimationSet mShadowAnimationSet;
 
@@ -224,6 +226,9 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			if (mShadowDirty) {
 				mShadowDirty = false;
 				mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
+
+				Log.d("RoundedButton", String.format("mElevation=%.2f, mTranslationZ=%.2f, mShadowSize=%.2f", mElevation, mTranslationZ, mShadowSize));
+
 				if (mShadowSize > mMaxElevation) {
 					mShadowSize = mMaxElevation;
 					if (!mPrintedShadowClipWarning) {
@@ -235,6 +240,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				}
 				buildComponents(getBounds());
 			}
+
 			float dy = mShadowSize / 2;
 			canvas.translate(0, dy);
 			drawShadow(canvas);
@@ -264,11 +270,10 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		void buildShadowCorners() {
 			if (mShadowSize > 0f) {
-				//float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
-				float innerRadius = 0f; //Math.max(mCornerRadius - insetShadow, 0.0f);
+				float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
+				float shadowRadius = Math.max(mCornerRadius - insetShadow, 0.0f);
 				float outerRadius = mCornerRadius + mShadowSize;
-				RectF innerBounds = new RectF(-innerRadius, -innerRadius, innerRadius, innerRadius);
-				RectF outerBounds = new RectF(-outerRadius, -outerRadius, outerRadius, outerRadius);
+				mOuterBounds.set(-outerRadius, -outerRadius, outerRadius, outerRadius);
 
 				if (mCornerShadowPath == null) {
 					mCornerShadowPath = new Path();
@@ -276,15 +281,15 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 					mCornerShadowPath.reset();
 				}
 				mCornerShadowPath.setFillType(Path.FillType.EVEN_ODD);
-				mCornerShadowPath.moveTo(-innerRadius, 0);
+				mCornerShadowPath.moveTo(0, 0);
 				mCornerShadowPath.lineTo(-outerRadius, 0);
 				// outer arc
-				mCornerShadowPath.arcTo(outerBounds, 180f, 90f, false);
+				mCornerShadowPath.arcTo(mOuterBounds, 180f, 90f, false);
 				// inner arc
-				mCornerShadowPath.arcTo(innerBounds, 270f, -90f, false);
+				mCornerShadowPath.arcTo(mInnerBounds, 270f, -90f, false);
 				mCornerShadowPath.close();
 
-				final float startRatio = innerRadius / outerRadius;
+				final float startRatio = shadowRadius / outerRadius;
 				final int[] colors = new int[]{mShadowStartColor, mShadowStartColor, mShadowEndColor};
 				final float[] stops = new float[]{0.0f, startRatio, 1.0f};
 				RadialGradient radialGradient = new RadialGradient(0, 0, outerRadius,

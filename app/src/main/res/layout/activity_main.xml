@@ -41,6 +41,7 @@
 			android:text="@string/hello_world"/>
 
 		<com.slaterama.fab2.widget.roundedbutton.RoundedImageButton
+			android:id="@+id/roundedimagebutton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="8dp"
@@ -52,6 +53,7 @@
 			app:qslib_maxElevation="8dp"/>
 
 		<com.slaterama.fab2.widget.roundedbutton.FloatingActionButton
+			android:id="@+id/floatingactionbutton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="8dp"
@@ -60,6 +62,7 @@
 			app:qslib_useCompatPadding="true"/>
 
 		<com.slaterama.fab2.widget.roundedbutton.FloatingActionButton
+			android:id="@+id/smallfloatingactionbutton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="8dp"
