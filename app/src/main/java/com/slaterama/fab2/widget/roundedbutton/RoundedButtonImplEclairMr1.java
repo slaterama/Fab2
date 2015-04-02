@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -165,10 +166,13 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		AnimationSet mShadowAnimationSet;
 
+		/**
+		 * If shadow size is set to a value above max shadow, we print a warning
+		 */
+		private boolean mPrintedShadowClipWarning = false;
+
 		public RoundedButtonDrawableEclairMr1() {
 			super();
-			mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
-
 			Resources resources = mView.getResources();
 			mAnimDuration = resources.getInteger(R.integer.qslib_button_pressed_animation_duration);
 			mShadowStartColor = resources.getColor(R.color.qslib_button_shadow_start_color);
@@ -220,6 +224,15 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			if (mShadowDirty) {
 				mShadowDirty = false;
 				mShadowSize = (mView.isEnabled() ? mElevation + mTranslationZ : 0);
+				if (mShadowSize > mMaxElevation) {
+					mShadowSize = mMaxElevation;
+					if (!mPrintedShadowClipWarning) {
+						String classname = mDelegate.getClass().getSimpleName();
+						Log.w("RoundedButton", "Shadow size is being clipped by the max shadow "
+								+ "size. See {" + classname + "#setMaxElevation}.");
+						mPrintedShadowClipWarning = true;
+					}
+				}
 				buildComponents(getBounds());
 			}
 			float dy = mShadowSize / 2;
