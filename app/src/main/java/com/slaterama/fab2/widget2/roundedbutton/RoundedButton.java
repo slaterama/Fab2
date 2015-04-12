@@ -11,8 +11,6 @@ import android.widget.Button;
 
 import com.slaterama.fab2.R;
 
-import static com.slaterama.fab2.widget2.roundedbutton.RoundedButtonImpl.setViewBackground;
-
 public class RoundedButton extends Button
 		implements RoundedButtonImpl.OnPaddingChangeListener {
 
@@ -41,7 +39,6 @@ public class RoundedButton extends Button
 	                             int defStyleRes) {
 		mImpl = new RoundedButtonImpl(this);
 		initializeImpl(mImpl, context, attrs, defStyleAttr, defStyleRes);
-		setViewBackground(this, mImpl);
 	}
 
 	void initializeImpl(RoundedButtonImpl impl, Context context, AttributeSet attrs,

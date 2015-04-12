@@ -12,28 +12,24 @@ import android.view.View;
 
 public class RoundedButtonImpl extends Drawable {
 
-	final static BackgroundHelper sBackgroundHelper = newBackgroundHelper();
+	final static BackgroundCompat sBackgroundCompat = newBackgroundCompat();
 
-	static ImplHelper newImplHelper() {
+	static GeneralCompat newGeneralCompat() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			return new ImplHelperLollipop();
+			return new GeneralCompatLollipop();
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
-			return new ImplHelperEclairMr1();
+			return new GeneralCompatEclairMr1();
 		} else {
 			throw new IllegalStateException("RoundedButton requires api 7 or higher");
 		}
 	}
 
-	static BackgroundHelper newBackgroundHelper() {
+	static BackgroundCompat newBackgroundCompat() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			return new BackgroundHelperJellyBean();
+			return new BackgroundCompatJellyBean();
 		} else {
-			return new BackgroundHelperBase();
+			return new BackgroundCompatBase();
 		}
-	}
-
-	static void setViewBackground(View view, Drawable background) {
-		sBackgroundHelper.setBackground(view, background);
 	}
 
 	View mView;
@@ -53,7 +49,7 @@ public class RoundedButtonImpl extends Drawable {
 	private float mDiameter;
 	private float mEnabledElevation; // TODO Might not need here
 
-	final ImplHelper mImplHelper = newImplHelper();
+	final GeneralCompat mGeneralCompat = newGeneralCompat();
 
 	public RoundedButtonImpl(View view) {
 		super();
@@ -63,6 +59,7 @@ public class RoundedButtonImpl extends Drawable {
 		} catch (ClassCastException e) {
 			throw new ClassCastException("view must implement OnPaddingChangeListener");
 		}
+		sBackgroundCompat.setBackground(view, this);
 	}
 
 	// Overridden getters/setters
@@ -128,7 +125,7 @@ public class RoundedButtonImpl extends Drawable {
 	public void setElevation(float elevation) {
 		if (elevation != mElevation) {
 			mElevation = elevation;
-			mImplHelper.setElevation(mView, elevation);
+			mGeneralCompat.setElevation(mView, elevation);
 		}
 	}
 
@@ -187,7 +184,7 @@ public class RoundedButtonImpl extends Drawable {
 	public void setTranslationZ(float translationZ) {
 		if (translationZ != mTranslationZ) {
 			mTranslationZ = translationZ;
-			mImplHelper.setTranslationZ(mView, translationZ);
+			mGeneralCompat.setTranslationZ(mView, translationZ);
 		}
 	}
 
@@ -198,7 +195,7 @@ public class RoundedButtonImpl extends Drawable {
 	public void setUseCompatAnimation(boolean useCompatAnimation) {
 		if (useCompatAnimation != mUseCompatAnimation) {
 			mUseCompatAnimation = useCompatAnimation;
-			mImplHelper.setUseCompatAnimation(useCompatAnimation);
+			mGeneralCompat.setUseCompatAnimation(useCompatAnimation);
 		}
 	}
 
@@ -213,7 +210,7 @@ public class RoundedButtonImpl extends Drawable {
 	public void setUseCompatPadding(boolean useCompatPadding) {
 		if (useCompatPadding != mUseCompatPadding) {
 			mUseCompatPadding = useCompatPadding;
-			mImplHelper.setUseCompatPadding(useCompatPadding);
+			mGeneralCompat.setUseCompatPadding(useCompatPadding);
 		}
 	}
 
@@ -242,7 +239,7 @@ public class RoundedButtonImpl extends Drawable {
 		// TODO
 	}
 
-	interface ImplHelper {
+	interface GeneralCompat {
 		void setElevation(View view, float elevation);
 
 		void setTranslationZ(View view, float translationZ);
@@ -253,7 +250,7 @@ public class RoundedButtonImpl extends Drawable {
 	}
 
 	@TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
-	static class ImplHelperEclairMr1 implements ImplHelper { // TODO Probably not static OR these methods require more arguments
+	static class GeneralCompatEclairMr1 implements GeneralCompat { // TODO Probably not static OR these methods require more arguments
 		@Override
 		public void setElevation(View view, float elevation) {
 			// TODO deal with "mEnabledElevation" etc. Will this require a non-static class?
@@ -276,7 +273,7 @@ public class RoundedButtonImpl extends Drawable {
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	static class ImplHelperLollipop implements ImplHelper {
+	static class GeneralCompatLollipop implements GeneralCompat {
 		@Override
 		public void setElevation(View view, float elevation) {
 			view.setElevation(elevation);
@@ -298,12 +295,12 @@ public class RoundedButtonImpl extends Drawable {
 		}
 	}
 
-	interface BackgroundHelper {
+	interface BackgroundCompat {
 		void setBackground(View view, Drawable background);
 	}
 
 	@TargetApi(Build.VERSION_CODES.BASE)
-	static class BackgroundHelperBase implements BackgroundHelper {
+	static class BackgroundCompatBase implements BackgroundCompat {
 		@Override
 		public void setBackground(View view, Drawable background) {
 			view.setBackgroundDrawable(background);
@@ -311,7 +308,7 @@ public class RoundedButtonImpl extends Drawable {
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	static class BackgroundHelperJellyBean implements BackgroundHelper {
+	static class BackgroundCompatJellyBean implements BackgroundCompat {
 		@Override
 		public void setBackground(View view, Drawable background) {
 			view.setBackground(background);
