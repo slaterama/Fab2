@@ -105,6 +105,7 @@ public abstract class RoundedButtonImpl {
 
 	public void setColor(ColorStateList color) {
 		mColor = color;
+		// TODO ?
 	}
 
 	public float getCornerRadius() {
