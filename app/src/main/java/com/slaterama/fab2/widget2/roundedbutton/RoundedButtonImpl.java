@@ -4,13 +4,20 @@ import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.Outline;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
-public class RoundedButtonImpl extends Drawable {
+/* TODO
+ * I need a class of type drawable. BackgroundDrawableLollipop will
+ * override getOutline and call outline.setRoundRect. Soooooo Impl will NOT be a drawable.
+ */
+
+public class RoundedButtonImpl {
 
 	final static BackgroundCompat sBackgroundCompat = newBackgroundCompat();
 
@@ -49,6 +56,8 @@ public class RoundedButtonImpl extends Drawable {
 	private float mDiameter;
 	private float mEnabledElevation; // TODO Might not need here
 
+	BackgroundDrawable mBackground;
+
 	final GeneralCompat mGeneralCompat = newGeneralCompat();
 
 	public RoundedButtonImpl(View view) {
@@ -59,24 +68,18 @@ public class RoundedButtonImpl extends Drawable {
 		} catch (ClassCastException e) {
 			throw new ClassCastException("view must implement OnPaddingChangeListener");
 		}
-		sBackgroundCompat.setBackground(view, this);
+		initialize();
 	}
 
-	// Overridden getters/setters
-
-	@Override
-	public void setAlpha(int alpha) {
-
-	}
-
-	@Override
-	public void setColorFilter(ColorFilter cf) {
-
-	}
-
-	@Override
-	public int getOpacity() {
-		return PixelFormat.OPAQUE;
+	void initialize() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			mBackground = new BackgroundDrawableLollipop();
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
+			mBackground = new BackgroundDrawableEclairMr1();
+		} else {
+			throw new IllegalStateException("RoundedButton requires api 7 or higher");
+		}
+		sBackgroundCompat.setBackground(mView, mBackground);
 	}
 
 	// Getters & setters
@@ -87,7 +90,7 @@ public class RoundedButtonImpl extends Drawable {
 
 	public void setColor(ColorStateList color) {
 		mColor = color;
-		invalidateSelf();
+		mBackground.invalidateSelf();
 	}
 
 	public Rect getContentPadding() {
@@ -139,7 +142,7 @@ public class RoundedButtonImpl extends Drawable {
 				|| insetPadding.right != mInsetPadding.right
 				|| insetPadding.bottom != mInsetPadding.bottom) {
 			mInsetPadding.set(insetPadding);
-			/*mRoundedButtonDrawable.*/ invalidateBounds();
+			mBackground.invalidateBounds();
 			invalidatePadding();
 		}
 	}
@@ -152,7 +155,7 @@ public class RoundedButtonImpl extends Drawable {
 		if (maxElevation != mMaxElevation) {
 			mMaxElevation = maxElevation;
 			if (shouldUseCompatPadding()) {
-				/*mRoundedButtonDrawable.*/ invalidateBounds();
+				mBackground.invalidateBounds();
 				invalidatePadding();
 			}
 		}
@@ -214,29 +217,63 @@ public class RoundedButtonImpl extends Drawable {
 		}
 	}
 
-	// Overridden methods
-
-	@Override
-	public void draw(Canvas canvas) {
-
-	}
-
 	// Methods
-
-	void invalidateBounds(Rect bounds, boolean invalidate) {
-		// TODO
-	}
-
-	void invalidateBounds(Rect bounds) {
-		invalidateBounds(bounds, false);
-	}
-
-	void invalidateBounds() {
-		invalidateBounds(getBounds(), true);
-	}
 
 	void invalidatePadding() {
 		// TODO
+	}
+
+	abstract class BackgroundDrawable extends Drawable {
+		Rect mBounds; // TODO Final? Create
+		Paint mPaint; // TODO Final? Create
+
+		@Override
+		public void setAlpha(int alpha) {
+			mPaint.setAlpha(alpha);
+		}
+
+		@Override
+		public void setColorFilter(ColorFilter cf) {
+			mPaint.setColorFilter(cf);
+		}
+
+		@Override
+		public int getOpacity() {
+			return PixelFormat.OPAQUE;
+		}
+
+		void invalidateBounds(Rect bounds, boolean invalidate) {
+			// TODO
+		}
+
+		void invalidateBounds(Rect bounds) {
+			invalidateBounds(bounds, false);
+		}
+
+		void invalidateBounds() {
+			invalidateBounds(getBounds(), true);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
+	class BackgroundDrawableEclairMr1 extends BackgroundDrawable {
+		@Override
+		public void draw(Canvas canvas) {
+
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	class BackgroundDrawableLollipop extends BackgroundDrawable {
+		@Override
+		public void getOutline(Outline outline) {
+			outline.setRoundRect(mBounds, mCornerRadius);
+		}
+
+		@Override
+		public void draw(Canvas canvas) {
+
+		}
 	}
 
 	interface GeneralCompat {
@@ -274,6 +311,10 @@ public class RoundedButtonImpl extends Drawable {
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	static class GeneralCompatLollipop implements GeneralCompat {
+		static boolean is() {
+			return true;
+		}
+
 		@Override
 		public void setElevation(View view, float elevation) {
 			view.setElevation(elevation);

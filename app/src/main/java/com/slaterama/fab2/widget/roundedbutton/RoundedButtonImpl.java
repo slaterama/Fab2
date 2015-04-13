@@ -1,6 +1,8 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
+import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -29,13 +31,19 @@ public abstract class RoundedButtonImpl {
 	// used to calculate overlap padding
 	static final double COS_45 = Math.cos(Math.toRadians(45));
 
+	static final BackgroundCompat sBackgroundCompat = (
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+			? new BackgroundCompatJellyBean()
+			: new BackgroundCompatBase());
+
+	static final RoundRectCompat sRoundRectCompat = (
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+			? new RoundRectCompatJellybeanMr1()
+			: new RoundRectCompatBase());
+
 	static RoundedButtonImpl newInstance(View view, RoundedButtonAttributes attributes) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			return new RoundedButtonImplLollipop(view, attributes);
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			return new RoundedButtonImplJellybeanMr1(view, attributes);
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			return new RoundedButtonImplJellybean(view, attributes);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			return new RoundedButtonImplHoneycomb(view, attributes);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
@@ -87,7 +95,7 @@ public abstract class RoundedButtonImpl {
 		mUseCompatPadding = attributes.useCompatPadding;
 
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
-		setSupportBackground(mRoundedButtonDrawable);
+		sBackgroundCompat.setBackground(view, getBackgroundDrawable(mRoundedButtonDrawable));
 		invalidatePadding();
 	}
 
@@ -97,7 +105,9 @@ public abstract class RoundedButtonImpl {
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
 
-	abstract void setSupportBackground(Drawable background);
+	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
+		return roundedButtonDrawable;
+	}
 
 	public ColorStateList getColor() {
 		return mColor;
@@ -409,6 +419,75 @@ public abstract class RoundedButtonImpl {
 		void setSupportTranslationZ(float translationZ);
 		void onPaddingChanged(int left, int top, int right, int bottom,
 		                      int horizontalShadowPadding, int verticalShadowPadding);
+	}
+
+	interface BackgroundCompat {
+		void setBackground(View view, Drawable background);
+	}
+
+	@TargetApi(Build.VERSION_CODES.BASE)
+	static class BackgroundCompatBase implements BackgroundCompat {
+		@Override
+		public void setBackground(View view, Drawable background) {
+			view.setBackgroundDrawable(background);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	static class BackgroundCompatJellyBean implements BackgroundCompat {
+		@Override
+		public void setBackground(View view, Drawable background) {
+			view.setBackground(background);
+		}
+	}
+
+	interface RoundRectCompat {
+		void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+		                   RectF cornerRect);
+	}
+
+	@TargetApi(Build.VERSION_CODES.BASE)
+	static class RoundRectCompatBase implements RoundRectCompat {
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+		                          RectF cornerRect) {
+			// Draws a round rect using 7 draw operations. This is faster than using
+			// canvas.drawRoundRect before JBMR1 because API 11-16 used alpha mask textures to draw
+			// shapes.
+			if (rect != null) {
+				final float twoRx = rx * 2;
+				final float twoRy = ry * 2;
+				final float innerWidth = rect.width() - twoRx;
+				final float innerHeight = rect.height() - twoRy;
+				cornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
+
+				canvas.drawArc(cornerRect, 180, 90, true, paint);
+				cornerRect.offset(innerWidth, 0);
+				canvas.drawArc(cornerRect, 270, 90, true, paint);
+				cornerRect.offset(0, innerHeight);
+				canvas.drawArc(cornerRect, 0, 90, true, paint);
+				cornerRect.offset(-innerWidth, 0);
+				canvas.drawArc(cornerRect, 90, 90, true, paint);
+
+				//draw top and bottom pieces
+				canvas.drawRect(rect.left + rx, rect.top, rect.right - rx, rect.top + ry, paint);
+				canvas.drawRect(rect.left + rx, rect.bottom - ry, rect.right - rx, rect.bottom,
+						paint);
+
+				//center
+				canvas.drawRect(rect.left, (float) Math.floor(rect.top + ry), rect.right,
+						(float) Math.ceil(rect.bottom - ry), paint);
+			}
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+	static class RoundRectCompatJellybeanMr1 implements RoundRectCompat {
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+		                          RectF cornerRect) {
+			canvas.drawRoundRect(rect, rx, ry, paint);
+		}
 	}
 
 	enum ButtonState {
