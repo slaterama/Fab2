@@ -27,10 +27,10 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 
 	StateListAnimator mSavedStateListAnimator;
 
-	public RoundedButtonImplLollipop(View view, RoundedButtonAttributes attributes) {
-		super(view, attributes);
-		view.setElevation(attributes.elevation);
-		view.setTranslationZ(attributes.translationZ);
+	public RoundedButtonImplLollipop(View view) {
+		super(view);
+//		view.setElevation(attributes.elevation);
+//		view.setTranslationZ(attributes.translationZ);
 		if (mUseCompatAnimation) {
 			mSavedStateListAnimator = view.getStateListAnimator();
 			view.setStateListAnimator(createStateListAnimator(mView, mElevation,

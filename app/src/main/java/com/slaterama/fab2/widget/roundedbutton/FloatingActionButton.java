@@ -3,13 +3,11 @@ package com.slaterama.fab2.widget.roundedbutton;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 
 import com.slaterama.fab2.R;
-
-import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonAttributes;
 
 public class FloatingActionButton extends RoundedImageButton {
 
@@ -32,54 +30,73 @@ public class FloatingActionButton extends RoundedImageButton {
 	}
 
 	@Override
-	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
-	                                       int defStyleRes) {
-		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton,
+	void initializeImpl(RoundedButtonImpl impl, Context context, AttributeSet attrs,
+	                    int defStyleAttr, int defStyleRes) {
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedButton,
 				defStyleAttr, defStyleRes);
-		attributes.color = a.getColorStateList(R.styleable.FloatingActionButton_qslib_buttonColor);
+
+		final int N = a.getIndexCount();
+		for (int i = 0; i < N; i++) {
+			int attr = a.getIndex(i);
+			switch (attr) {
+				case R.styleable.FloatingActionButton_qslib_buttonColor:
+					impl.setColor(a.getColorStateList(attr));
+					break;
+				case R.styleable.FloatingActionButton_qslib_cornerRadius:
+					impl.setCornerRadius(a.getDimension(attr, 0f));
+					break;
+				case R.styleable.FloatingActionButton_qslib_elevation:
+					impl.setElevation(a.getDimension(attr, 0f));
+					break;
+				case R.styleable.FloatingActionButton_qslib_maxElevation:
+					impl.setMaxElevation(a.getDimension(attr, 0f));
+					break;
+				case R.styleable.FloatingActionButton_qslib_pressedTranslationZ:
+					impl.setPressedTranslationZ(a.getDimension(attr, 0f));
+					break;
+				case R.styleable.FloatingActionButton_qslib_preventCornerOverlap:
+					impl.setPreventCornerOverlap(a.getBoolean(attr, false));
+					break;
+				case R.styleable.FloatingActionButton_qslib_translationZ:
+					impl.setTranslationZ(a.getDimension(attr, 0f));
+					break;
+				case R.styleable.FloatingActionButton_qslib_useCompatAnimation:
+					impl.setUseCompatAnimation(a.getBoolean(attr, false));
+					break;
+				case R.styleable.FloatingActionButton_qslib_useCompatPadding:
+					impl.setUseCompatPadding(a.getBoolean(attr, false));
+					break;
+			}
+		}
+
+		// We'll always set contentPadding & drawablePadding
 		int defaultContentPadding = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPadding, 0);
-		attributes.contentPadding.left = a.getDimensionPixelOffset(
+		Rect contentPadding = new Rect();
+		contentPadding.left = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPaddingLeft, defaultContentPadding);
-		attributes.contentPadding.top = a.getDimensionPixelOffset(
+		contentPadding.top = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPaddingTop, defaultContentPadding);
-		attributes.contentPadding.right = a.getDimensionPixelOffset(
+		contentPadding.right = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPaddingRight, defaultContentPadding);
-		attributes.contentPadding.bottom = a.getDimensionPixelOffset(
+		contentPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPaddingBottom, defaultContentPadding);
-		attributes.cornerRadius = a.getDimension(
-				R.styleable.FloatingActionButton_qslib_cornerRadius, attributes.cornerRadius);
-		attributes.elevation = a.getDimension(R.styleable.FloatingActionButton_qslib_elevation,
-				attributes.elevation);
+		impl.setContentPadding(contentPadding);
+
 		int defaultInsetPadding = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPadding, 0);
-		attributes.insetPadding.left = a.getDimensionPixelOffset(
+		Rect insetPadding = new Rect();
+		insetPadding.left = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPaddingLeft, defaultInsetPadding);
-		attributes.insetPadding.top = a.getDimensionPixelOffset(
+		insetPadding.top = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPaddingTop, defaultInsetPadding);
-		attributes.insetPadding.right = a.getDimensionPixelOffset(
+		insetPadding.right = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPaddingRight, defaultInsetPadding);
-		attributes.insetPadding.bottom = a.getDimensionPixelOffset(
+		insetPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPaddingBottom, defaultInsetPadding);
-		attributes.maxElevation = a.getDimension(
-				R.styleable.FloatingActionButton_qslib_maxElevation, attributes.maxElevation);
-		attributes.pressedTranslationZ = a.getDimension(
-				R.styleable.FloatingActionButton_qslib_pressedTranslationZ,
-				attributes.pressedTranslationZ);
-		attributes.preventCornerOverlap = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_preventCornerOverlap,
-				attributes.preventCornerOverlap);
-		attributes.translationZ = a.getDimension(
-				R.styleable.FloatingActionButton_qslib_translationZ, attributes.translationZ);
-		attributes.useCompatAnimation = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_useCompatAnimation,
-				attributes.useCompatAnimation);
-		attributes.useCompatPadding = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_useCompatPadding,
-				attributes.useCompatPadding);
+		impl.setInsetPadding(insetPadding);
+
 		a.recycle();
-		return attributes;
 	}
 
 	@Override

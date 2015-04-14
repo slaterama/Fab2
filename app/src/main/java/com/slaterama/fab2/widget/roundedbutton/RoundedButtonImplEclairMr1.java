@@ -3,6 +3,7 @@ package com.slaterama.fab2.widget.roundedbutton;
 import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -82,8 +83,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 	final RectF mCornerRect = new RectF();
 
-	public RoundedButtonImplEclairMr1(View view, RoundedButtonAttributes attributes) {
-		super(view, attributes);
+	public RoundedButtonImplEclairMr1(View view) {
+		super(view);
 	}
 
 	@Override
@@ -147,7 +148,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			mCornerShadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 			mSolidPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
-			mPaint.setColor(mColor.getDefaultColor());
+			mPaint.setColor(mColor == null ? Color.TRANSPARENT : mColor.getDefaultColor());
 
 			mCornerShadowPaint.setStyle(Paint.Style.FILL);
 			mCornerShadowPaint.setDither(true);

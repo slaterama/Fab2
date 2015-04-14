@@ -3,6 +3,7 @@ package com.slaterama.fab2.widget.roundedbutton;
 import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -13,6 +14,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.StateSet;
 import android.view.View;
+
+/*
+ * TODO Remove "attributes" object and make setting of attributes like in widget2.RoundedButton
+ */
 
 @SuppressWarnings("unused")
 public abstract class RoundedButtonImpl {
@@ -41,15 +46,15 @@ public abstract class RoundedButtonImpl {
 			? new RoundRectCompatJellybeanMr1()
 			: new RoundRectCompatBase());
 
-	static RoundedButtonImpl newInstance(View view, RoundedButtonAttributes attributes) {
+	static RoundedButtonImpl newInstance(View view) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			return new RoundedButtonImplLollipop(view, attributes);
+			return new RoundedButtonImplLollipop(view);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			return new RoundedButtonImplHoneycomb(view, attributes);
+			return new RoundedButtonImplHoneycomb(view);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
-			return new RoundedButtonImplEclairMr1(view, attributes);
+			return new RoundedButtonImplEclairMr1(view);
 		} else {
-			throw new IllegalStateException("RoundedButton requires at API 7 or above");
+			throw new IllegalStateException("RoundedButton requires API 7 or above");
 		}
 	}
 
@@ -72,7 +77,7 @@ public abstract class RoundedButtonImpl {
 	RoundedButtonDrawable mRoundedButtonDrawable;
 	final Point mShadowPadding = new Point();
 
-	public RoundedButtonImpl(View view, RoundedButtonAttributes attributes) {
+	public RoundedButtonImpl(View view) {
 		super();
 		mView = view;
 		try {
@@ -80,20 +85,8 @@ public abstract class RoundedButtonImpl {
 		} catch (ClassCastException e) {
 			throw new ClassCastException("view must implement RoundedButtonDelegate");
 		}
-		mColor = attributes.color;
-		mContentPadding = new Rect(attributes.contentPadding);
-		mCornerRadius = attributes.cornerRadius;
-		mDiameter = Math.round(attributes.cornerRadius * 2);
-		mElevation = attributes.elevation;
-		mEnabledElevation = mElevation;
-		mInsetPadding = new Rect(attributes.insetPadding);
-		mMaxElevation = attributes.maxElevation;
-		mPressedTranslationZ = attributes.pressedTranslationZ;
-		mPreventCornerOverlap = attributes.preventCornerOverlap;
-		mTranslationZ = attributes.translationZ;
-		mUseCompatAnimation = attributes.useCompatAnimation;
-		mUseCompatPadding = attributes.useCompatPadding;
-
+		mContentPadding = new Rect();
+		mInsetPadding = new Rect();
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
 		sBackgroundCompat.setBackground(view, getBackgroundDrawable(mRoundedButtonDrawable));
 		invalidatePadding();
@@ -308,7 +301,7 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		public boolean isStateful() {
-			return mColor.isStateful();
+			return mColor != null && mColor.isStateful();
 		}
 
 		@Override
@@ -325,7 +318,9 @@ public abstract class RoundedButtonImpl {
 					mButtonState = buttonState;
 					onButtonStateChange(buttonState);
 				}
-				int color = mColor.getColorForState(state, mColor.getDefaultColor());
+				int color = (mColor == null
+						? Color.TRANSPARENT
+						: mColor.getColorForState(state, mColor.getDefaultColor()));
 				if (color != mPaint.getColor()) {
 					mPaint.setColor(color);
 					invalidateSelf();
@@ -396,20 +391,6 @@ public abstract class RoundedButtonImpl {
 		mDelegate.onPaddingChanged(left, top, right, bottom, horizontalShadowPadding,
 				verticalShadowPadding);
 		mView.requestLayout();
-	}
-
-	static class RoundedButtonAttributes {
-		ColorStateList color = null;
-		final Rect contentPadding = new Rect();
-		float cornerRadius = 0f;
-		float elevation = 0f;
-		final Rect insetPadding = new Rect();
-		float maxElevation = 0f;
-		float pressedTranslationZ = 0f;
-		boolean preventCornerOverlap = false;
-		float translationZ = 0f;
-		boolean useCompatAnimation = false;
-		boolean useCompatPadding = false;
 	}
 
 	interface RoundedButtonDelegate {
