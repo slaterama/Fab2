@@ -15,10 +15,6 @@ import android.os.Build;
 import android.util.StateSet;
 import android.view.View;
 
-/*
- * TODO Remove "attributes" object and make setting of attributes like in widget2.RoundedButton
- */
-
 @SuppressWarnings("unused")
 public abstract class RoundedButtonImpl {
 
@@ -38,13 +34,13 @@ public abstract class RoundedButtonImpl {
 
 	static final BackgroundCompat sBackgroundCompat = (
 			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-			? new BackgroundCompatJellyBean()
-			: new BackgroundCompatBase());
+					? new BackgroundCompatJellyBean()
+					: new BackgroundCompatBase());
 
 	static final RoundRectCompat sRoundRectCompat = (
 			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
-			? new RoundRectCompatJellybeanMr1()
-			: new RoundRectCompatBase());
+					? new RoundRectCompatJellybeanMr1()
+					: new RoundRectCompatBase());
 
 	static RoundedButtonImpl newInstance(View view) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -61,12 +57,12 @@ public abstract class RoundedButtonImpl {
 	View mView;
 	RoundedButtonDelegate mDelegate;
 	ColorStateList mColor;
-	final Rect mContentPadding;
+	final Rect mContentPadding = new Rect();
 	float mCornerRadius;
 	int mDiameter;
 	float mElevation;
 	float mEnabledElevation;
-	final Rect mInsetPadding;
+	final Rect mInsetPadding = new Rect();
 	float mMaxElevation;
 	float mPressedTranslationZ;
 	boolean mPreventCornerOverlap;
@@ -85,15 +81,38 @@ public abstract class RoundedButtonImpl {
 		} catch (ClassCastException e) {
 			throw new ClassCastException("view must implement RoundedButtonDelegate");
 		}
-		mContentPadding = new Rect();
-		mInsetPadding = new Rect();
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
 		sBackgroundCompat.setBackground(view, getBackgroundDrawable(mRoundedButtonDrawable));
-		invalidatePadding();
+//		invalidatePadding();
 	}
 
-	void initialize() {
-		mRoundedButtonDrawable.initialize();
+	void initialize(RoundedButtonAttributes attributes) {
+//		mRoundedButtonDrawable.initialize();
+
+		mColor = attributes.color;
+		mContentPadding.set(attributes.contentPadding);
+		mCornerRadius = attributes.cornerRadius;
+		mDiameter = Math.round(attributes.cornerRadius + 2);
+		mElevation = attributes.elevation;
+		mInsetPadding.set(attributes.insetPadding);
+		mMaxElevation = attributes.maxElevation;
+		mPressedTranslationZ = attributes.pressedTranslationZ;
+		mPreventCornerOverlap = attributes.preventCornerOverlap;
+		mTranslationZ = attributes.translationZ;
+		mUseCompatAnimation = attributes.useCompatAnimation;
+		mUseCompatPadding = attributes.useCompatPadding;
+
+//		mRoundedButtonDrawable = newRoundedButtonDrawable();
+//		sBackgroundCompat.setBackground(mView, getBackgroundDrawable(mRoundedButtonDrawable));
+//		mRoundedButtonDrawable.initialize();
+
+		onElevationChanged(mElevation);
+		onTranslationZChanged(mTranslationZ);
+		onUseCompatAnimationChanged(mUseCompatAnimation);
+		onUseCompatPaddingChanged(mUseCompatPadding);
+
+		mRoundedButtonDrawable.invalidateSelf();
+		invalidatePadding();
 	}
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
@@ -253,7 +272,7 @@ public abstract class RoundedButtonImpl {
 	}
 
 	void resolveSize(int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
-	                 Point resolvedSize) {
+					 Point resolvedSize) {
 		final int minWidth = mDiameter + mInsetPadding.left + mInsetPadding.right
 				+ mShadowPadding.x * 2;
 		final int minHeight = mDiameter + mInsetPadding.top + mInsetPadding.bottom
@@ -267,7 +286,7 @@ public abstract class RoundedButtonImpl {
 	}
 
 	abstract class RoundedButtonDrawable extends Drawable {
-		boolean mInitialized;
+//		boolean mInitialized;
 		int[] mPendingState;
 		int[] mCurrentSpecs;
 		ButtonState mButtonState;
@@ -276,6 +295,7 @@ public abstract class RoundedButtonImpl {
 		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
 
+		/*
 		void initialize() {
 			mInitialized = true;
 			if (mPendingState != null) {
@@ -283,6 +303,7 @@ public abstract class RoundedButtonImpl {
 				mPendingState = null;
 			}
 		}
+		*/
 
 		@Override
 		public void setAlpha(int alpha) {
@@ -312,7 +333,7 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
-			if (mInitialized) {
+//			if (mInitialized) {
 				ButtonState buttonState = ButtonState.fromState(state);
 				if (!buttonState.equals(mButtonState)) {
 					mButtonState = buttonState;
@@ -326,9 +347,9 @@ public abstract class RoundedButtonImpl {
 					invalidateSelf();
 					return true;
 				}
-			} else {
-				mPendingState = state;
-			}
+//			} else {
+//				mPendingState = state;
+//			}
 
 			return super.onStateChange(state);
 		}
@@ -395,11 +416,15 @@ public abstract class RoundedButtonImpl {
 
 	interface RoundedButtonDelegate {
 		float getSupportElevation();
+
 		void setSupportElevation(float elevation);
+
 		float getSupportTranslationZ();
+
 		void setSupportTranslationZ(float translationZ);
+
 		void onPaddingChanged(int left, int top, int right, int bottom,
-		                      int horizontalShadowPadding, int verticalShadowPadding);
+							  int horizontalShadowPadding, int verticalShadowPadding);
 	}
 
 	interface BackgroundCompat {
@@ -424,14 +449,14 @@ public abstract class RoundedButtonImpl {
 
 	interface RoundRectCompat {
 		void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
-		                   RectF cornerRect);
+						   RectF cornerRect);
 	}
 
 	@TargetApi(Build.VERSION_CODES.BASE)
 	static class RoundRectCompatBase implements RoundRectCompat {
 		@Override
 		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
-		                          RectF cornerRect) {
+								  RectF cornerRect) {
 			// Draws a round rect using 7 draw operations. This is faster than using
 			// canvas.drawRoundRect before JBMR1 because API 11-16 used alpha mask textures to draw
 			// shapes.
@@ -466,9 +491,23 @@ public abstract class RoundedButtonImpl {
 	static class RoundRectCompatJellybeanMr1 implements RoundRectCompat {
 		@Override
 		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
-		                          RectF cornerRect) {
+								  RectF cornerRect) {
 			canvas.drawRoundRect(rect, rx, ry, paint);
 		}
+	}
+
+	static class RoundedButtonAttributes {
+		ColorStateList color = null;
+		final Rect contentPadding = new Rect();
+		float cornerRadius = 0f;
+		float elevation = 0f;
+		final Rect insetPadding = new Rect();
+		float maxElevation = 0f;
+		float pressedTranslationZ = 0f;
+		boolean preventCornerOverlap = false;
+		float translationZ = 0f;
+		boolean useCompatAnimation = false;
+		boolean useCompatPadding = false;
 	}
 
 	enum ButtonState {
