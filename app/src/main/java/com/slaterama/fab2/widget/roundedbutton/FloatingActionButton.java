@@ -75,7 +75,6 @@ public class FloatingActionButton extends RoundedImageButton {
 		return attributes;
 	}
 
-
 	@Override
 	boolean shouldUseMeasuredSize() {
 		return false;

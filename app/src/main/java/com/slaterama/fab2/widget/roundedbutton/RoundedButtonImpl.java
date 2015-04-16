@@ -6,6 +6,7 @@ package com.slaterama.fab2.widget.roundedbutton;
  *    Instead, pass in an initialize method. This
  *    Should fix the onStateChanged timing issue
  * 2. Fix the "onMeasure" thing. Use getMinimumWidth/Height?
+ *    (This should also get rid of shouldUseMeasuredSize method)
  */
 
 import android.annotation.TargetApi;
