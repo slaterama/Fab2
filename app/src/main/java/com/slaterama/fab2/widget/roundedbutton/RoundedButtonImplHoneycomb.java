@@ -48,6 +48,11 @@ public class RoundedButtonImplHoneycomb extends RoundedButtonImplEclairMr1 {
 		return new RoundedButtonDrawableHoneycomb();
 	}
 
+	@Override
+	RoundedButtonDrawable newRoundedButtonDrawable() {
+		return new RoundedButtonDrawableHoneycomb();
+	}
+
 	class RoundedButtonDrawableHoneycomb extends RoundedButtonDrawableEclairMr1 {
 		AnimatorSet mShadowAnimatorSet;
 

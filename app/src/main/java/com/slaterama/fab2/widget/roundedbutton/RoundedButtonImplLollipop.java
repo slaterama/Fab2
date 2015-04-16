@@ -27,10 +27,10 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 
 	StateListAnimator mSavedStateListAnimator;
 
-	public RoundedButtonImplLollipop(View view) {
-		super(view);
-//		view.setElevation(attributes.elevation);
-//		view.setTranslationZ(attributes.translationZ);
+	public RoundedButtonImplLollipop(View view, RoundedButtonAttributes attributes) {
+		super(view, attributes);
+		view.setElevation(attributes.elevation);
+		view.setTranslationZ(attributes.translationZ);
 		if (mUseCompatAnimation) {
 			mSavedStateListAnimator = view.getStateListAnimator();
 			view.setStateListAnimator(createStateListAnimator(mView, mElevation,
@@ -42,15 +42,6 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
 		return new RoundedButtonDrawableLollipop();
-	}
-
-	@Override
-	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
-		TypedValue outValue = new TypedValue();
-		mView.getContext().getTheme().resolveAttribute(android.R.attr.colorControlHighlight,
-				outValue, true);
-		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
-		return new RippleDrawable(rippleColor, roundedButtonDrawable, null);
 	}
 
 	@Override
@@ -89,6 +80,15 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 	void onUseCompatPaddingChanged(boolean useCompatPadding) {
 		mRoundedButtonDrawable.invalidateBounds();
 		invalidatePadding();
+	}
+
+	@Override
+	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
+		TypedValue outValue = new TypedValue();
+		mView.getContext().getTheme().resolveAttribute(android.R.attr.colorControlHighlight,
+				outValue, true);
+		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
+		return new RippleDrawable(rippleColor, roundedButtonDrawable, null);
 	}
 
 	class RoundedButtonDrawableLollipop extends RoundedButtonDrawable {
