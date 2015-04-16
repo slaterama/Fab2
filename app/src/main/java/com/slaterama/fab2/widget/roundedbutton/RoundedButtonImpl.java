@@ -1,6 +1,16 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
+/*
+ * TODO
+ * 1. Don't pass attributes to impl in constructor
+ *    Instead, pass in an initialize method. This
+ *    Should fix the onStateChanged timing issue
+ * 2. Fix the "onMeasure" thing. Use getMinimumWidth/Height?
+ */
+
+import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -32,10 +42,6 @@ public abstract class RoundedButtonImpl {
 	static RoundedButtonImpl newInstance(View view, RoundedButtonAttributes attributes) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			return new RoundedButtonImplLollipop(view, attributes);
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			return new RoundedButtonImplJellybeanMr1(view, attributes);
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			return new RoundedButtonImplJellybean(view, attributes);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			return new RoundedButtonImplHoneycomb(view, attributes);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
@@ -44,6 +50,16 @@ public abstract class RoundedButtonImpl {
 			throw new IllegalStateException("RoundedButton requires at API 7 or above");
 		}
 	}
+
+	static final BackgroundHelper sBackgroundHelper = (
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+					? new BackgroundHelperJellyBean()
+					: new BackgroundHelperBase());
+
+	static final RoundRectHelper sRoundRectHelper = (
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+					? new RoundRectHelperJellybeanMr1()
+					: new RoundRectHelperBase());
 
 	View mView;
 	RoundedButtonDelegate mDelegate;
@@ -87,7 +103,7 @@ public abstract class RoundedButtonImpl {
 		mUseCompatPadding = attributes.useCompatPadding;
 
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
-		setSupportBackground(mRoundedButtonDrawable);
+		sBackgroundHelper.setBackground(view, getBackgroundDrawable(mRoundedButtonDrawable));
 		invalidatePadding();
 	}
 
@@ -97,7 +113,9 @@ public abstract class RoundedButtonImpl {
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
 
-	abstract void setSupportBackground(Drawable background);
+	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
+		return roundedButtonDrawable;
+	}
 
 	public ColorStateList getColor() {
 		return mColor;
@@ -249,7 +267,7 @@ public abstract class RoundedButtonImpl {
 	}
 
 	void resolveSize(int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
-	                 Point resolvedSize) {
+					 Point resolvedSize) {
 		final int minWidth = mDiameter + mInsetPadding.left + mInsetPadding.right
 				+ mShadowPadding.x * 2;
 		final int minHeight = mDiameter + mInsetPadding.top + mInsetPadding.bottom
@@ -262,6 +280,34 @@ public abstract class RoundedButtonImpl {
 				View.resolveSize(requestedHeight, heightMeasureSpec));
 	}
 
+	void invalidatePadding() {
+		final int cornerOverlapPadding = (mPreventCornerOverlap ?
+				(int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
+		final int horizontalShadowPadding;
+		final int verticalShadowPadding;
+		if (willUseCompatPadding()) {
+			mShadowPadding.set(Math.round(mMaxElevation),
+					Math.round(mMaxElevation * SHADOW_MULTIPLIER));
+			horizontalShadowPadding = mShadowPadding.x * 2;
+			verticalShadowPadding = mShadowPadding.y * 2;
+		} else {
+			mShadowPadding.set(0, 0);
+			horizontalShadowPadding = 0;
+			verticalShadowPadding = 0;
+		}
+		int left = mInsetPadding.left + mShadowPadding.x + cornerOverlapPadding
+				+ mContentPadding.left;
+		int top = mInsetPadding.top + mShadowPadding.y + cornerOverlapPadding
+				+ mContentPadding.top;
+		int right = mInsetPadding.right + mShadowPadding.x + cornerOverlapPadding
+				+ mContentPadding.right;
+		int bottom = mInsetPadding.bottom + mShadowPadding.y + cornerOverlapPadding
+				+ mContentPadding.bottom;
+		mDelegate.onPaddingChanged(left, top, right, bottom, horizontalShadowPadding,
+				verticalShadowPadding);
+		mView.requestLayout();
+	}
+
 	abstract class RoundedButtonDrawable extends Drawable {
 		boolean mInitialized;
 		int[] mPendingState;
@@ -271,6 +317,7 @@ public abstract class RoundedButtonImpl {
 		final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 		final Rect mBounds = new Rect();
 		final RectF mBoundsF = new RectF();
+		final RectF mCornerRect = new RectF();
 
 		void initialize() {
 			mInitialized = true;
@@ -330,6 +377,12 @@ public abstract class RoundedButtonImpl {
 		void onButtonStateChange(ButtonState buttonState) {
 		}
 
+		@Override
+		public void draw(Canvas canvas) {
+			sRoundRectHelper.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint,
+					mCornerRect);
+		}
+
 		void invalidateBounds(Rect bounds, boolean invalidate) {
 			mBounds.set(bounds);
 			mBounds.left += mInsetPadding.left;
@@ -359,34 +412,6 @@ public abstract class RoundedButtonImpl {
 		}
 	}
 
-	void invalidatePadding() {
-		final int cornerOverlapPadding = (mPreventCornerOverlap ?
-				(int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
-		final int horizontalShadowPadding;
-		final int verticalShadowPadding;
-		if (willUseCompatPadding()) {
-			mShadowPadding.set(Math.round(mMaxElevation),
-					Math.round(mMaxElevation * SHADOW_MULTIPLIER));
-			horizontalShadowPadding = mShadowPadding.x * 2;
-			verticalShadowPadding = mShadowPadding.y * 2;
-		} else {
-			mShadowPadding.set(0, 0);
-			horizontalShadowPadding = 0;
-			verticalShadowPadding = 0;
-		}
-		int left = mInsetPadding.left + mShadowPadding.x + cornerOverlapPadding
-				+ mContentPadding.left;
-		int top = mInsetPadding.top + mShadowPadding.y + cornerOverlapPadding
-				+ mContentPadding.top;
-		int right = mInsetPadding.right + mShadowPadding.x + cornerOverlapPadding
-				+ mContentPadding.right;
-		int bottom = mInsetPadding.bottom + mShadowPadding.y + cornerOverlapPadding
-				+ mContentPadding.bottom;
-		mDelegate.onPaddingChanged(left, top, right, bottom, horizontalShadowPadding,
-				verticalShadowPadding);
-		mView.requestLayout();
-	}
-
 	static class RoundedButtonAttributes {
 		ColorStateList color = null;
 		final Rect contentPadding = new Rect();
@@ -401,13 +426,92 @@ public abstract class RoundedButtonImpl {
 		boolean useCompatPadding = false;
 	}
 
+	interface BackgroundHelper {
+		void setBackground(View view, Drawable background);
+	}
+
+	@TargetApi(Build.VERSION_CODES.BASE)
+	static class BackgroundHelperBase implements BackgroundHelper {
+		@Override
+		public void setBackground(View view, Drawable background) {
+			view.setBackgroundDrawable(background);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	static class BackgroundHelperJellyBean implements BackgroundHelper {
+		@Override
+		public void setBackground(View view, Drawable background) {
+			view.setBackground(background);
+		}
+	}
+
+	interface RoundRectHelper {
+		void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+						   RectF cornerRect);
+	}
+
+	@TargetApi(Build.VERSION_CODES.BASE)
+	static class RoundRectHelperBase implements RoundRectHelper {
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+								  RectF cornerRect) {
+			// Draws a round rect using 7 draw operations. This is faster than using
+			// canvas.drawRoundRect before JBMR1 because API 11-16 used alpha mask textures to draw
+			// shapes.
+			if (rect != null) {
+				final float twoRx = rx * 2;
+				final float twoRy = ry * 2;
+				final float innerWidth = rect.width() - twoRx;
+				final float innerHeight = rect.height() - twoRy;
+
+				float left = rect.left;
+				float top = rect.top;
+				float right = rect.left + twoRx;
+				float bottom = rect.top + twoRy;
+				cornerRect.set(rect.left, rect.top, rect.left + twoRx, rect.top + twoRy);
+
+				canvas.drawArc(cornerRect, 180, 90, true, paint);
+				cornerRect.offset(innerWidth, 0);
+				canvas.drawArc(cornerRect, 270, 90, true, paint);
+				cornerRect.offset(0, innerHeight);
+				canvas.drawArc(cornerRect, 0, 90, true, paint);
+				cornerRect.offset(-innerWidth, 0);
+				canvas.drawArc(cornerRect, 90, 90, true, paint);
+
+				//draw top and bottom pieces
+				canvas.drawRect(rect.left + rx, rect.top, rect.right - rx, rect.top + ry, paint);
+				canvas.drawRect(rect.left + rx, rect.bottom - ry, rect.right - rx, rect.bottom,
+						paint);
+
+				//center
+				canvas.drawRect(rect.left, (float) Math.floor(rect.top + ry), rect.right,
+						(float) Math.ceil(rect.bottom - ry), paint);
+			}
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+	static class RoundRectHelperJellybeanMr1 implements RoundRectHelper {
+		@Override
+		public void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
+								  RectF cornerRect) {
+			canvas.drawRoundRect(rect, rx, ry, paint);
+		}
+	}
+
+
 	interface RoundedButtonDelegate {
 		float getSupportElevation();
+
 		void setSupportElevation(float elevation);
+
 		float getSupportTranslationZ();
+
 		void setSupportTranslationZ(float translationZ);
+
 		void onPaddingChanged(int left, int top, int right, int bottom,
-		                      int horizontalShadowPadding, int verticalShadowPadding);
+							  int horizontalShadowPadding, int verticalShadowPadding);
 	}
 
 	enum ButtonState {

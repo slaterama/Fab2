@@ -12,7 +12,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
+public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 
 	static StateListAnimator createStateListAnimator(View view, float elevation,
 	                                                 float pressedTranslationZ) {
@@ -42,11 +42,6 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
 		return new RoundedButtonDrawableLollipop();
-	}
-
-	@Override
-	void setSupportBackground(Drawable background) {
-		mView.setBackground(wrapBackgroundDrawable(background));
 	}
 
 	@Override
@@ -87,12 +82,13 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplJellybeanMr1 {
 		invalidatePadding();
 	}
 
-	protected Drawable wrapBackgroundDrawable(Drawable background) {
+	@Override
+	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
 		TypedValue outValue = new TypedValue();
 		mView.getContext().getTheme().resolveAttribute(android.R.attr.colorControlHighlight,
 				outValue, true);
 		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
-		return new RippleDrawable(rippleColor, background, null);
+		return new RippleDrawable(rippleColor, roundedButtonDrawable, null);
 	}
 
 	class RoundedButtonDrawableLollipop extends RoundedButtonDrawable {

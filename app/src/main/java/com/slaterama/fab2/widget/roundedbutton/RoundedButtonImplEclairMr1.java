@@ -11,7 +11,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +27,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	// It's already (kind of) happening in onStateChanged. Maybe instead of checking if the
 	// color changed, check if the STATE changed.
 
+	/*
 	static void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint,
 	                          RectF cornerRect) {
 		// Draws a round rect using 7 draw operations. This is faster than using
@@ -58,6 +58,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 					(float) Math.ceil(rect.bottom - ry), paint);
 		}
 	}
+	*/
 
 	static AnimationSet createAnimation(ButtonState buttonState, View view,
 	                                    final RoundedButtonDelegate delegate,
@@ -112,8 +113,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		return animationSet;
 	}
 
-	final RectF mCornerRect = new RectF();
-
 	public RoundedButtonImplEclairMr1(View view, RoundedButtonAttributes attributes) {
 		super(view, attributes);
 	}
@@ -121,11 +120,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
 		return new RoundedButtonDrawableEclairMr1();
-	}
-
-	@Override
-	void setSupportBackground(Drawable background) {
-		mView.setBackgroundDrawable(background);
 	}
 
 	@Override
@@ -247,7 +241,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				drawShadow(canvas);
 				canvas.translate(0, -dy);
 			}
-			drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
+			super.draw(canvas);
+//			drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
 		@Override
@@ -256,9 +251,11 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			invalidateSelf();
 		}
 
+		/*
 		protected void drawRoundRect(Canvas canvas, RectF rect, float rx, float ry, Paint paint) {
 			RoundedButtonImplEclairMr1.drawRoundRect(canvas, rect, rx, ry, paint, mCornerRect);
 		}
+		*/
 
 		void buildComponents(Rect bounds) {
 			// Button is offset SHADOW_MULTIPLIER * maxElevation to account for the shadow shift.
