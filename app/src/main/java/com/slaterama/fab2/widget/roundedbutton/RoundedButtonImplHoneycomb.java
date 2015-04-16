@@ -39,13 +39,8 @@ public class RoundedButtonImplHoneycomb extends RoundedButtonImplEclairMr1 {
 		return animator;
 	}
 
-	public RoundedButtonImplHoneycomb(View view) {
-		super(view);
-	}
-
-	@Override
-	RoundedButtonDrawable newRoundedButtonDrawable() {
-		return new RoundedButtonDrawableHoneycomb();
+	public RoundedButtonImplHoneycomb(View view, RoundedButtonAttributes attributes) {
+		super(view, attributes);
 	}
 
 	@Override
