@@ -98,11 +98,6 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 		}
 
 		@Override
-		public void draw(Canvas canvas) {
-			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
-		}
-
-		@Override
 		void onButtonStateChange(ButtonState buttonState) {
 			// NO OP
 		}
