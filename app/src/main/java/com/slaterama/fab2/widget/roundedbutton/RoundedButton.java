@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -20,8 +19,6 @@ public class RoundedButton extends Button
 		implements RoundedButtonDelegate {
 
 	RoundedButtonImpl mImpl;
-
-	final Point mResolvedSize = new Point();
 
 	public RoundedButton(Context context) {
 		this(context, null);
@@ -43,12 +40,11 @@ public class RoundedButton extends Button
 	}
 
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		mImpl = RoundedButtonImpl.newInstance(this,
-				fillAttributes(context, attrs, defStyleAttr, defStyleRes));
-		mImpl.initialize();
+		mImpl = RoundedButtonImpl.newInstance(this);
+		mImpl.setAttributes(getAttributes(context, attrs, defStyleAttr, defStyleRes));
 	}
 
-	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
+	RoundedButtonAttributes getAttributes(Context context, AttributeSet attrs, int defStyleAttr,
 										   int defStyleRes) {
 		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedButton,
@@ -81,9 +77,11 @@ public class RoundedButton extends Button
 		attributes.maxElevation = a.getDimension(R.styleable.RoundedButton_qslib_maxElevation,
 				attributes.maxElevation);
 		attributes.pressedTranslationZ = a.getDimension(
-				R.styleable.RoundedButton_qslib_pressedTranslationZ, attributes.pressedTranslationZ);
+				R.styleable.RoundedButton_qslib_pressedTranslationZ,
+				attributes.pressedTranslationZ);
 		attributes.preventCornerOverlap = a.getBoolean(
-				R.styleable.RoundedButton_qslib_preventCornerOverlap, attributes.preventCornerOverlap);
+				R.styleable.RoundedButton_qslib_preventCornerOverlap,
+				attributes.preventCornerOverlap);
 		attributes.translationZ = a.getDimension(R.styleable.RoundedButton_qslib_translationZ,
 				attributes.translationZ);
 		attributes.useCompatAnimation = a.getBoolean(
@@ -227,9 +225,9 @@ public class RoundedButton extends Button
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		// TODO Use drawable getMinWidth, getMinHeight
-		mImpl.resolveSize(widthMeasureSpec, heightMeasureSpec, true, mResolvedSize);
-		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
+		int measuredWidth = Math.max(mImpl.getMinimumWidth(), getMeasuredWidth());
+		int measuredHeight = Math.max(mImpl.getMinimumHeight(), getMeasuredHeight());
+		setMeasuredDimension(measuredWidth, measuredHeight);
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -21,8 +20,6 @@ public class RoundedImageButton extends ImageButton
 
 	RoundedButtonImpl mImpl;
 
-	final Point mResolvedSize = new Point();
-
 	public RoundedImageButton(Context context) {
 		this(context, null);
 	}
@@ -37,18 +34,18 @@ public class RoundedImageButton extends ImageButton
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public RoundedImageButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+	public RoundedImageButton(Context context, AttributeSet attrs, int defStyleAttr,
+							  int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 		initialize(context, attrs, defStyleAttr, defStyleRes);
 	}
 
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		mImpl = RoundedButtonImpl.newInstance(this,
-				fillAttributes(context, attrs, defStyleAttr, defStyleRes));
-		mImpl.initialize();
+		mImpl = RoundedButtonImpl.newInstance(this);
+		mImpl.setAttributes(getAttributes(context, attrs, defStyleAttr, defStyleRes));
 	}
 
-	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
+	RoundedButtonAttributes getAttributes(Context context, AttributeSet attrs, int defStyleAttr,
 										   int defStyleRes) {
 		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedImageButton,
@@ -81,13 +78,16 @@ public class RoundedImageButton extends ImageButton
 		attributes.maxElevation = a.getDimension(R.styleable.RoundedImageButton_qslib_maxElevation,
 				attributes.maxElevation);
 		attributes.pressedTranslationZ = a.getDimension(
-				R.styleable.RoundedImageButton_qslib_pressedTranslationZ, attributes.pressedTranslationZ);
+				R.styleable.RoundedImageButton_qslib_pressedTranslationZ,
+				attributes.pressedTranslationZ);
 		attributes.preventCornerOverlap = a.getBoolean(
-				R.styleable.RoundedImageButton_qslib_preventCornerOverlap, attributes.preventCornerOverlap);
+				R.styleable.RoundedImageButton_qslib_preventCornerOverlap,
+				attributes.preventCornerOverlap);
 		attributes.translationZ = a.getDimension(R.styleable.RoundedImageButton_qslib_translationZ,
 				attributes.translationZ);
 		attributes.useCompatAnimation = a.getBoolean(
-				R.styleable.RoundedImageButton_qslib_useCompatAnimation, attributes.useCompatAnimation);
+				R.styleable.RoundedImageButton_qslib_useCompatAnimation,
+				attributes.useCompatAnimation);
 		attributes.useCompatPadding = a.getBoolean(
 				R.styleable.RoundedImageButton_qslib_useCompatPadding, attributes.useCompatPadding);
 		a.recycle();
@@ -227,14 +227,9 @@ public class RoundedImageButton extends ImageButton
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		// TODO Use drawable getMinWidth, getMinHeight
-		mImpl.resolveSize(widthMeasureSpec, heightMeasureSpec, shouldUseMeasuredSize(),
-				mResolvedSize);
-		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
-	}
-
-	boolean shouldUseMeasuredSize() {
-		return true;
+		int measuredWidth = Math.max(mImpl.getMinimumWidth(), getMeasuredWidth());
+		int measuredHeight = Math.max(mImpl.getMinimumHeight(), getMeasuredHeight());
+		setMeasuredDimension(measuredWidth, measuredHeight);
 	}
 
 	@Override

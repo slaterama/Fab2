@@ -29,7 +29,8 @@ public class FloatingActionButton extends RoundedImageButton {
 		super(context, attrs, defStyleAttr, defStyleRes);
 	}
 
-	RoundedButtonAttributes fillAttributes(Context context, AttributeSet attrs, int defStyleAttr,
+	@Override
+	RoundedButtonAttributes getAttributes(Context context, AttributeSet attrs, int defStyleAttr,
 										   int defStyleRes) {
 		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedImageButton,
@@ -45,7 +46,8 @@ public class FloatingActionButton extends RoundedImageButton {
 				R.styleable.FloatingActionButton_qslib_contentPaddingRight, defaultContentPadding);
 		attributes.contentPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_contentPaddingBottom, defaultContentPadding);
-		attributes.cornerRadius = a.getDimension(R.styleable.FloatingActionButton_qslib_cornerRadius,
+		attributes.cornerRadius = a.getDimension(
+				R.styleable.FloatingActionButton_qslib_cornerRadius,
 				attributes.cornerRadius);
 		attributes.elevation = a.getDimension(R.styleable.FloatingActionButton_qslib_elevation,
 				attributes.elevation);
@@ -59,24 +61,31 @@ public class FloatingActionButton extends RoundedImageButton {
 				R.styleable.FloatingActionButton_qslib_insetPaddingRight, defaultInsetPadding);
 		attributes.insetPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.FloatingActionButton_qslib_insetPaddingBottom, defaultInsetPadding);
-		attributes.maxElevation = a.getDimension(R.styleable.FloatingActionButton_qslib_maxElevation,
+		attributes.maxElevation = a.getDimension(
+				R.styleable.FloatingActionButton_qslib_maxElevation,
 				attributes.maxElevation);
 		attributes.pressedTranslationZ = a.getDimension(
-				R.styleable.FloatingActionButton_qslib_pressedTranslationZ, attributes.pressedTranslationZ);
+				R.styleable.FloatingActionButton_qslib_pressedTranslationZ,
+				attributes.pressedTranslationZ);
 		attributes.preventCornerOverlap = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_preventCornerOverlap, attributes.preventCornerOverlap);
-		attributes.translationZ = a.getDimension(R.styleable.FloatingActionButton_qslib_translationZ,
+				R.styleable.FloatingActionButton_qslib_preventCornerOverlap,
+				attributes.preventCornerOverlap);
+		attributes.translationZ = a.getDimension(
+				R.styleable.FloatingActionButton_qslib_translationZ,
 				attributes.translationZ);
 		attributes.useCompatAnimation = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_useCompatAnimation, attributes.useCompatAnimation);
+				R.styleable.FloatingActionButton_qslib_useCompatAnimation,
+				attributes.useCompatAnimation);
 		attributes.useCompatPadding = a.getBoolean(
-				R.styleable.FloatingActionButton_qslib_useCompatPadding, attributes.useCompatPadding);
+				R.styleable.FloatingActionButton_qslib_useCompatPadding,
+				attributes.useCompatPadding);
 		a.recycle();
 		return attributes;
 	}
 
 	@Override
-	boolean shouldUseMeasuredSize() {
-		return false;
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		setMeasuredDimension(mImpl.getMinimumWidth(), mImpl.getMinimumHeight());
 	}
 }

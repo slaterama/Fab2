@@ -1,14 +1,5 @@
 package com.slaterama.fab2.widget.roundedbutton;
 
-/*
- * TODO
- * 1. Don't pass attributes to impl in constructor
- *    Instead, pass in an initialize method. This
- *    Should fix the onStateChanged timing issue
- * 2. Fix the "onMeasure" thing. Use getMinimumWidth/Height?
- *    (This should also get rid of shouldUseMeasuredSize method)
- */
-
 import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
@@ -40,13 +31,13 @@ public abstract class RoundedButtonImpl {
 	// used to calculate overlap padding
 	static final double COS_45 = Math.cos(Math.toRadians(45));
 
-	static RoundedButtonImpl newInstance(View view, RoundedButtonAttributes attributes) {
+	static RoundedButtonImpl newInstance(View view) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			return new RoundedButtonImplLollipop(view, attributes);
+			return new RoundedButtonImplLollipop(view);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			return new RoundedButtonImplHoneycomb(view, attributes);
+			return new RoundedButtonImplHoneycomb(view);
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
-			return new RoundedButtonImplEclairMr1(view, attributes);
+			return new RoundedButtonImplEclairMr1(view);
 		} else {
 			throw new IllegalStateException("RoundedButton requires at API 7 or above");
 		}
@@ -65,12 +56,12 @@ public abstract class RoundedButtonImpl {
 	View mView;
 	RoundedButtonDelegate mDelegate;
 	ColorStateList mColor;
-	final Rect mContentPadding;
+	final Rect mContentPadding = new Rect();
 	float mCornerRadius;
 	int mDiameter;
 	float mElevation;
 	float mEnabledElevation;
-	final Rect mInsetPadding;
+	final Rect mInsetPadding = new Rect();
 	float mMaxElevation;
 	float mPressedTranslationZ;
 	boolean mPreventCornerOverlap;
@@ -81,7 +72,7 @@ public abstract class RoundedButtonImpl {
 	RoundedButtonDrawable mRoundedButtonDrawable;
 	final Point mShadowPadding = new Point();
 
-	public RoundedButtonImpl(View view, RoundedButtonAttributes attributes) {
+	public RoundedButtonImpl(View view) {
 		super();
 		mView = view;
 		try {
@@ -89,27 +80,25 @@ public abstract class RoundedButtonImpl {
 		} catch (ClassCastException e) {
 			throw new ClassCastException("view must implement RoundedButtonDelegate");
 		}
+	}
+
+	void setAttributes(RoundedButtonAttributes attributes) {
 		mColor = attributes.color;
-		mContentPadding = new Rect(attributes.contentPadding);
+		mContentPadding.set(attributes.contentPadding);
 		mCornerRadius = attributes.cornerRadius;
 		mDiameter = Math.round(attributes.cornerRadius * 2);
 		mElevation = attributes.elevation;
 		mEnabledElevation = mElevation;
-		mInsetPadding = new Rect(attributes.insetPadding);
+		mInsetPadding.set(attributes.insetPadding);
 		mMaxElevation = attributes.maxElevation;
 		mPressedTranslationZ = attributes.pressedTranslationZ;
 		mPreventCornerOverlap = attributes.preventCornerOverlap;
 		mTranslationZ = attributes.translationZ;
 		mUseCompatAnimation = attributes.useCompatAnimation;
 		mUseCompatPadding = attributes.useCompatPadding;
-
 		mRoundedButtonDrawable = newRoundedButtonDrawable();
-		sBackgroundHelper.setBackground(view, getBackgroundDrawable(mRoundedButtonDrawable));
+		sBackgroundHelper.setBackground(mView, getBackgroundDrawable(mRoundedButtonDrawable));
 		invalidatePadding();
-	}
-
-	void initialize() {
-		mRoundedButtonDrawable.initialize();
 	}
 
 	abstract RoundedButtonDrawable newRoundedButtonDrawable();
@@ -135,7 +124,8 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setContentPadding(Rect contentPadding) {
-		if (contentPadding.left != mContentPadding.left || contentPadding.top != mContentPadding.top
+		if (contentPadding.left != mContentPadding.left
+				|| contentPadding.top != mContentPadding.top
 				|| contentPadding.right != mContentPadding.right
 				|| contentPadding.bottom != mContentPadding.bottom) {
 			mContentPadding.set(contentPadding);
@@ -172,7 +162,8 @@ public abstract class RoundedButtonImpl {
 	}
 
 	public void setInsetPadding(Rect insetPadding) {
-		if (insetPadding.left != mInsetPadding.left || insetPadding.top != mInsetPadding.top
+		if (insetPadding.left != mInsetPadding.left
+				|| insetPadding.top != mInsetPadding.top
 				|| insetPadding.right != mInsetPadding.right
 				|| insetPadding.bottom != mInsetPadding.bottom) {
 			mInsetPadding.set(insetPadding);
@@ -193,6 +184,14 @@ public abstract class RoundedButtonImpl {
 				invalidatePadding();
 			}
 		}
+	}
+
+	public int getMinimumHeight() {
+		return mRoundedButtonDrawable.getMinimumHeight();
+	}
+
+	public int getMinimumWidth() {
+		return mRoundedButtonDrawable.getMinimumWidth();
 	}
 
 	public float getPressedTranslationZ() {
@@ -267,20 +266,6 @@ public abstract class RoundedButtonImpl {
 	void onUseCompatPaddingChanged(boolean useCompatPadding) {
 	}
 
-	void resolveSize(int widthMeasureSpec, int heightMeasureSpec, boolean useMeasuredSize,
-					 Point resolvedSize) {
-		final int minWidth = mDiameter + mInsetPadding.left + mInsetPadding.right
-				+ mShadowPadding.x * 2;
-		final int minHeight = mDiameter + mInsetPadding.top + mInsetPadding.bottom
-				+ mShadowPadding.y * 2;
-		int requestedWidth = (useMeasuredSize
-				? Math.max(minWidth, mView.getMeasuredWidth()) : minWidth);
-		int requestedHeight = (useMeasuredSize
-				? Math.max(minHeight, mView.getMeasuredHeight()) : minHeight);
-		resolvedSize.set(View.resolveSize(requestedWidth, widthMeasureSpec),
-				View.resolveSize(requestedHeight, heightMeasureSpec));
-	}
-
 	void invalidatePadding() {
 		final int cornerOverlapPadding = (mPreventCornerOverlap ?
 				(int) Math.ceil((1 - COS_45) * mCornerRadius) : 0);
@@ -311,7 +296,7 @@ public abstract class RoundedButtonImpl {
 
 	abstract class RoundedButtonDrawable extends Drawable {
 		boolean mInitialized;
-		int[] mPendingState;
+//		int[] mPendingState;
 		int[] mCurrentSpecs;
 		ButtonState mButtonState;
 
@@ -320,6 +305,7 @@ public abstract class RoundedButtonImpl {
 		final RectF mBoundsF = new RectF();
 		final RectF mCornerRect = new RectF();
 
+		/*
 		void initialize() {
 			mInitialized = true;
 			if (mPendingState != null) {
@@ -327,6 +313,7 @@ public abstract class RoundedButtonImpl {
 				mPendingState = null;
 			}
 		}
+		*/
 
 		@Override
 		public void setAlpha(int alpha) {
@@ -336,6 +323,16 @@ public abstract class RoundedButtonImpl {
 		@Override
 		public void setColorFilter(ColorFilter cf) {
 			mPaint.setColorFilter(cf);
+		}
+
+		@Override
+		public int getMinimumHeight() {
+			return mDiameter + mShadowPadding.y * 2 + mInsetPadding.top + mInsetPadding.bottom;
+		}
+
+		@Override
+		public int getMinimumWidth() {
+			return mDiameter + mShadowPadding.x * 2 + mInsetPadding.left + mInsetPadding.right;
 		}
 
 		@Override
@@ -356,7 +353,7 @@ public abstract class RoundedButtonImpl {
 
 		@Override
 		protected boolean onStateChange(int[] state) {
-			if (mInitialized) {
+//			if (mInitialized) {
 				ButtonState buttonState = ButtonState.fromState(state);
 				if (!buttonState.equals(mButtonState)) {
 					mButtonState = buttonState;
@@ -368,9 +365,9 @@ public abstract class RoundedButtonImpl {
 					invalidateSelf();
 					return true;
 				}
-			} else {
-				mPendingState = state;
-			}
+//			} else {
+//				mPendingState = state;
+//			}
 
 			return super.onStateChange(state);
 		}
