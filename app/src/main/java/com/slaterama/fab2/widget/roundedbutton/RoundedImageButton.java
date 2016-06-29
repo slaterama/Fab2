@@ -4,13 +4,13 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
 
 import com.slaterama.fab2.R;
+import com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonAttributes;
 
 import static com.slaterama.fab2.widget.roundedbutton.RoundedButtonImpl.RoundedButtonDelegate;
 
@@ -19,8 +19,6 @@ public class RoundedImageButton extends ImageButton
 		implements RoundedButtonDelegate {
 
 	RoundedButtonImpl mImpl;
-
-	final Point mResolvedSize = new Point();
 
 	public RoundedImageButton(Context context) {
 		this(context, null);
@@ -37,84 +35,63 @@ public class RoundedImageButton extends ImageButton
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public RoundedImageButton(Context context, AttributeSet attrs, int defStyleAttr,
-	                          int defStyleRes) {
+							  int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 		initialize(context, attrs, defStyleAttr, defStyleRes);
 	}
 
 	void initialize(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		mImpl = RoundedButtonImpl.newInstance(this);
-		initializeImpl(mImpl, context, attrs, defStyleAttr, defStyleRes);
-		mImpl.initialize(); // TODO Think about all of this initializing. Can it be combined?
+		mImpl.setAttributes(getAttributes(context, attrs, defStyleAttr, defStyleRes));
 	}
 
-	void initializeImpl(RoundedButtonImpl impl, Context context, AttributeSet attrs,
-	                    int defStyleAttr, int defStyleRes) {
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedButton,
+	RoundedButtonAttributes getAttributes(Context context, AttributeSet attrs, int defStyleAttr,
+										   int defStyleRes) {
+		RoundedButtonAttributes attributes = new RoundedButtonAttributes();
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RoundedImageButton,
 				defStyleAttr, defStyleRes);
-
-		final int N = a.getIndexCount();
-		for (int i = 0; i < N; i++) {
-			int attr = a.getIndex(i);
-			switch (attr) {
-				case R.styleable.RoundedImageButton_qslib_buttonColor:
-					impl.setColor(a.getColorStateList(attr));
-					break;
-				case R.styleable.RoundedImageButton_qslib_cornerRadius:
-					impl.setCornerRadius(a.getDimension(attr, 0f));
-					break;
-				case R.styleable.RoundedImageButton_qslib_elevation:
-					impl.setElevation(a.getDimension(attr, 0f));
-					break;
-				case R.styleable.RoundedImageButton_qslib_maxElevation:
-					impl.setMaxElevation(a.getDimension(attr, 0f));
-					break;
-				case R.styleable.RoundedImageButton_qslib_pressedTranslationZ:
-					impl.setPressedTranslationZ(a.getDimension(attr, 0f));
-					break;
-				case R.styleable.RoundedImageButton_qslib_preventCornerOverlap:
-					impl.setPreventCornerOverlap(a.getBoolean(attr, false));
-					break;
-				case R.styleable.RoundedImageButton_qslib_translationZ:
-					impl.setTranslationZ(a.getDimension(attr, 0f));
-					break;
-				case R.styleable.RoundedImageButton_qslib_useCompatAnimation:
-					impl.setUseCompatAnimation(a.getBoolean(attr, false));
-					break;
-				case R.styleable.RoundedImageButton_qslib_useCompatPadding:
-					impl.setUseCompatPadding(a.getBoolean(attr, false));
-					break;
-			}
-		}
-
-		// We'll always set contentPadding & drawablePadding
+		attributes.color = a.getColorStateList(R.styleable.RoundedImageButton_qslib_buttonColor);
 		int defaultContentPadding = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_contentPadding, 0);
-		Rect contentPadding = new Rect();
-		contentPadding.left = a.getDimensionPixelOffset(
+		attributes.contentPadding.left = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_contentPaddingLeft, defaultContentPadding);
-		contentPadding.top = a.getDimensionPixelOffset(
+		attributes.contentPadding.top = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_contentPaddingTop, defaultContentPadding);
-		contentPadding.right = a.getDimensionPixelOffset(
+		attributes.contentPadding.right = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_contentPaddingRight, defaultContentPadding);
-		contentPadding.bottom = a.getDimensionPixelOffset(
+		attributes.contentPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_contentPaddingBottom, defaultContentPadding);
-		impl.setContentPadding(contentPadding);
-
+		attributes.cornerRadius = a.getDimension(R.styleable.RoundedImageButton_qslib_cornerRadius,
+				attributes.cornerRadius);
+		attributes.elevation = a.getDimension(R.styleable.RoundedImageButton_qslib_elevation,
+				attributes.elevation);
 		int defaultInsetPadding = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_insetPadding, 0);
-		Rect insetPadding = new Rect();
-		insetPadding.left = a.getDimensionPixelOffset(
+		attributes.insetPadding.left = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_insetPaddingLeft, defaultInsetPadding);
-		insetPadding.top = a.getDimensionPixelOffset(
+		attributes.insetPadding.top = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_insetPaddingTop, defaultInsetPadding);
-		insetPadding.right = a.getDimensionPixelOffset(
+		attributes.insetPadding.right = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_insetPaddingRight, defaultInsetPadding);
-		insetPadding.bottom = a.getDimensionPixelOffset(
+		attributes.insetPadding.bottom = a.getDimensionPixelOffset(
 				R.styleable.RoundedImageButton_qslib_insetPaddingBottom, defaultInsetPadding);
-		impl.setInsetPadding(insetPadding);
-
+		attributes.maxElevation = a.getDimension(R.styleable.RoundedImageButton_qslib_maxElevation,
+				attributes.maxElevation);
+		attributes.pressedTranslationZ = a.getDimension(
+				R.styleable.RoundedImageButton_qslib_pressedTranslationZ,
+				attributes.pressedTranslationZ);
+		attributes.preventCornerOverlap = a.getBoolean(
+				R.styleable.RoundedImageButton_qslib_preventCornerOverlap,
+				attributes.preventCornerOverlap);
+		attributes.translationZ = a.getDimension(R.styleable.RoundedImageButton_qslib_translationZ,
+				attributes.translationZ);
+		attributes.useCompatAnimation = a.getBoolean(
+				R.styleable.RoundedImageButton_qslib_useCompatAnimation,
+				attributes.useCompatAnimation);
+		attributes.useCompatPadding = a.getBoolean(
+				R.styleable.RoundedImageButton_qslib_useCompatPadding, attributes.useCompatPadding);
 		a.recycle();
+		return attributes;
 	}
 
 	@Override
@@ -247,22 +224,17 @@ public class RoundedImageButton extends ImageButton
 		mImpl.setUseCompatPadding(useCompatPadding);
 	}
 
-	boolean shouldUseMeasuredSize() {
-		return true;
-	}
-
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		// TODO Use drawable getMinWidth, getMinHeight
-		mImpl.resolveSize(widthMeasureSpec, heightMeasureSpec, shouldUseMeasuredSize(),
-				mResolvedSize);
-		setMeasuredDimension(mResolvedSize.x, mResolvedSize.y);
+		int measuredWidth = Math.max(mImpl.getMinimumWidth(), getMeasuredWidth());
+		int measuredHeight = Math.max(mImpl.getMinimumHeight(), getMeasuredHeight());
+		setMeasuredDimension(measuredWidth, measuredHeight);
 	}
 
 	@Override
 	public void onPaddingChanged(int left, int top, int right, int bottom,
-	                             int horizontalShadowPadding, int verticalShadowPadding) {
+								 int horizontalShadowPadding, int verticalShadowPadding) {
 		super.setPadding(left, top, right, bottom);
 		setMinimumWidth(getSuggestedMinimumWidth() + horizontalShadowPadding);
 		setMinimumHeight(getSuggestedMinimumHeight() + verticalShadowPadding);

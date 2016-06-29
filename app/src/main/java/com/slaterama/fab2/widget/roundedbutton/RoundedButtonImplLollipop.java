@@ -29,28 +29,24 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 
 	public RoundedButtonImplLollipop(View view) {
 		super(view);
-//		view.setElevation(attributes.elevation);
-//		view.setTranslationZ(attributes.translationZ);
-		if (mUseCompatAnimation) {
-			mSavedStateListAnimator = view.getStateListAnimator();
-			view.setStateListAnimator(createStateListAnimator(mView, mElevation,
-					mPressedTranslationZ));
-		}
 		view.setClipToOutline(true);
+	}
+
+	@Override
+	void setAttributes(RoundedButtonAttributes attributes) {
+		super.setAttributes(attributes);
+		mView.setElevation(attributes.elevation);
+		mView.setTranslationZ(attributes.translationZ);
+		if (attributes.useCompatAnimation) {
+			mSavedStateListAnimator = mView.getStateListAnimator();
+			mView.setStateListAnimator(createStateListAnimator(mView, attributes.elevation,
+					attributes.pressedTranslationZ));
+		}
 	}
 
 	@Override
 	RoundedButtonDrawable newRoundedButtonDrawable() {
 		return new RoundedButtonDrawableLollipop();
-	}
-
-	@Override
-	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
-		TypedValue outValue = new TypedValue();
-		mView.getContext().getTheme().resolveAttribute(android.R.attr.colorControlHighlight,
-				outValue, true);
-		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
-		return new RippleDrawable(rippleColor, roundedButtonDrawable, null);
 	}
 
 	@Override
@@ -91,15 +87,19 @@ public class RoundedButtonImplLollipop extends RoundedButtonImplHoneycomb {
 		invalidatePadding();
 	}
 
+	@Override
+	Drawable getBackgroundDrawable(RoundedButtonDrawable roundedButtonDrawable) {
+		TypedValue outValue = new TypedValue();
+		mView.getContext().getTheme().resolveAttribute(android.R.attr.colorControlHighlight,
+				outValue, true);
+		ColorStateList rippleColor = ColorStateList.valueOf(outValue.data);
+		return new RippleDrawable(rippleColor, roundedButtonDrawable, null);
+	}
+
 	class RoundedButtonDrawableLollipop extends RoundedButtonDrawable {
 		@Override
 		public void getOutline(Outline outline) {
 			outline.setRoundRect(mBounds, mCornerRadius);
-		}
-
-		@Override
-		public void draw(Canvas canvas) {
-			canvas.drawRoundRect(mBoundsF, mCornerRadius, mCornerRadius, mPaint);
 		}
 
 		@Override

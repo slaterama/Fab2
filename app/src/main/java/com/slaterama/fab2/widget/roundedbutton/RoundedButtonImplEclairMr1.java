@@ -3,7 +3,6 @@ package com.slaterama.fab2.widget.roundedbutton;
 import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -81,8 +80,6 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 		return animationSet;
 	}
 
-	final RectF mCornerRect = new RectF();
-
 	public RoundedButtonImplEclairMr1(View view) {
 		super(view);
 	}
@@ -148,7 +145,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 			mCornerShadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 			mSolidPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
-			mPaint.setColor(mColor == null ? Color.TRANSPARENT : mColor.getDefaultColor());
+			mPaint.setColor(mColor.getDefaultColor());
 
 			mCornerShadowPaint.setStyle(Paint.Style.FILL);
 			mCornerShadowPaint.setDither(true);
@@ -211,8 +208,7 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				drawShadow(canvas);
 				canvas.translate(0, -dy);
 			}
-			sRoundRectCompat.drawRoundRect(canvas, mBoundsF, mCornerRadius, mCornerRadius, mPaint,
-					mCornerRect);
+			super.draw(canvas);
 		}
 
 		@Override
@@ -253,7 +249,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 				mCornerShadowPath.close();
 
 				final float startRatio = shadowRadius / outerRadius;
-				final int[] colors = new int[]{mShadowStartColor, mShadowStartColor, mShadowEndColor};
+				final int[] colors = new int[]{mShadowStartColor, mShadowStartColor,
+						mShadowEndColor};
 				final float[] stops = new float[]{0.0f, startRatio, 1.0f};
 				RadialGradient radialGradient = new RadialGradient(0, 0, outerRadius,
 						colors, stops, Shader.TileMode.CLAMP);
@@ -272,9 +269,8 @@ public class RoundedButtonImplEclairMr1 extends RoundedButtonImpl {
 
 		void drawShadow(Canvas canvas) {
 			if (mShadowSize > 0) {
-				//float insetShadow = mShadowSize / 2 + mInsetShadowExtra;
 				final float edgeShadowTop = -mCornerRadius - mShadowSize;
-				final float edgeShadowBottom = 0f; //Math.min(-mCornerRadius + insetShadow, 0.0f);
+				final float edgeShadowBottom = 0f;
 				float inset = mCornerRadius;
 				final boolean drawHorizontalEdges = mBoundsF.width() > 2 * mCornerRadius;
 				final boolean drawVerticalEdges = mBoundsF.height() > 2 * mCornerRadius;
